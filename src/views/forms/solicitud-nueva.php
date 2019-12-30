@@ -1,11 +1,10 @@
-<form id="form_detalles">
     <div class="card">
         <div class="card-header">
             <h3>Detalles de la Solicitud</h3>
         </div>
         <div class="card-body">
         <div class="form-group row">
-            <label class="control-label col-sm-4" for="destino">Origen:</label>
+            <label class="control-label col-sm-4" for="origen">Origen:</label>
             <div class="col-sm-8">
                 <input type="text" class="form-control" name="origen" placeholder="Origen o Ruta">
             </div>
@@ -37,19 +36,19 @@
             <label class="control-label col-sm-3" for="servicio">Servicios:</label>
             <div class="col-sm-9">
                 <label class="cursor-pointer">
-                    <input type="checkbox" name="vuelo" value="VUELO">
+                    <input type="checkbox" name="vuelo" value="vuelo">
                     Vuelo
                 </label>
                 <label class="cursor-pointer">
-                    <input type="checkbox" name="Hotel" value="HOTEL">
+                    <input type="checkbox" name="hotel" value="hotel">
                     Hotel
                 </label>
                 <label class="cursor-pointer">
-                    <input type="checkbox" name="traslado" value="TRASLADO">
+                    <input type="checkbox" name="traslados" value="traslados">
                     Traslados
                 </label>
                 <label class="cursor-pointer">
-                    <input type="checkbox" name="Tours" value="TOURS">
+                    <input type="checkbox" name="tours" value="tours">
                     Tours
                 </label>
             </div>
@@ -59,11 +58,11 @@
             <label class="control-label col-sm-3" for="flexible">Fecha:</label>
             <div class="col-sm-9">
                 <label class="cursor-pointer">
-                    <input type="radio" name="flexible" option="SI">
+                    <input type="radio" name="flexible" value="flexible">
                     Flexible
                 </label>
                 <label class="cursor-pointer">
-                    <input type="radio" name="flexible" option="NO">
+                    <input type="radio" name="flexible" value="fija">
                     Exacta
                 </label>
             </div>
@@ -92,5 +91,4 @@
     </div>
     </div>
     
-    <input class="btn btn-success" type="submit" name="enviar" value="Registrar Solicitud">
-</form>
+    <input class="btn btn-success" type="submit" name="enviar" value="Registrar Solicitud" id="registrar_solicitud">

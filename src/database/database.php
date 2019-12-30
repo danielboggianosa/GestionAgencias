@@ -157,7 +157,7 @@ function pdm_db_install(){
       `pdm_solicitud_cantidad_adt` INT NULL,
       `pdm_solicitud_cantidad_chd` INT NULL,
       `pdm_solicitud_cantidad_inf` INT NULL,
-      `pdm_solicitud_descripción` TEXT NULL,
+      `pdm_solicitud_descripcion` TEXT NULL,
       PRIMARY KEY (`pdm_solicitud_id`))
     $charset_collate
     ENGINE = InnoDB;";

@@ -1,4 +1,4 @@
-<?php include RUTA."src/views/common/head.php" ?>
+<?php include RUTA."src/views/common/head.php"?>
 <div class="wrap">
     <div id="tabs">
         <ul>
@@ -13,7 +13,7 @@
             <button class="btn btn-link" id="add_det"><i class="fa fa-plus" id="add_det_btn"></i> Agregar Detalles</button>
             <button class="btn btn-link" id="add_pax"><i class="fa fa-plus" id="add_iti_btn"></i> Agretar Itinerario</button>
             <form id="form_pasajero"></form>
-            <div id="cotizacion_detalles" class="row"></div>
+            <form id="form_solicitud"></form>
             <div id="cotizacion_view"></div>
         </div>
         <div id="progreso">
@@ -30,6 +30,7 @@ var old_pax = false;
 var new_det = false;
 var new_iti = false;
 var valores=[];
+var pasajero="";
 var html;
 $("#add_pasajero").click(()=>{
     if(new_pax){
@@ -105,7 +106,40 @@ $("#add_pax").click(()=>{
     }
 })
 $("#add_det").click(()=>{
-    $("#cotizacion_detalles").load(plugin_ruta+"src/views/forms/solicitud-nueva.php");
+    if(new_det){
+        $("#form_solicitud").html("");
+        $("#add_det_btn").removeClass("fa-minus");
+        $("#add_det_btn").addClass("fa-plus");
+        new_det = !new_det;
+    }
+    else{
+        if(pasajero == ""){
+            alert("Primero debes agregar un pasajero");
+        }
+        else{
+            $("#form_solicitud").load(plugin_ruta+"src/views/forms/solicitud-nueva.php",()=>{
+                $("#registrar_solicitud").click((e)=>{
+                    e.preventDefault();
+                    var data = $("#form_solicitud").serialize();
+                    $.ajax({
+                        url:plugin_ruta+"src/controllers/solicitudController.php",
+                        type:'POST',
+                        data: 'pasajero='+pasajero+'&insertar=true&'+data,
+                        success: (res)=>{
+                            $("#form_solicitud").html("");
+                            $("#add_det_btn").removeClass("fa-minus");
+                            $("#add_det_btn").addClass("fa-plus");
+                            new_det = !new_det;                        
+                        }
+                    })
+                });
+            });
+            $("#add_det_btn").removeClass("fa-plus");
+            $("#add_det_btn").addClass("fa-minus");
+            new_det = !new_det;
+            $("#form_solicitud").submit((e)=>e.preventDefault());
+        }
+    }
 });
 
 function seleccionar(index){
@@ -117,6 +151,7 @@ function seleccionar(index){
     $("#add_pax").hide();
     $("#add_pasajero").hide();
     old_pax = !old_pax;
+    pasajero = res.id;
 }
 
 </script>
