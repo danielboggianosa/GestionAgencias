@@ -13,7 +13,7 @@
             <button class="btn btn-link" id="add_det"><i class="fa fa-plus" id="add_det_btn"></i> Agregar Detalles</button>
             <button class="btn btn-link" id="add_pax"><i class="fa fa-plus" id="add_iti_btn"></i> Agretar Itinerario</button>
             <form id="form_pasajero"></form>
-            <div id="cotizacion_detalles"></div>
+            <div id="cotizacion_detalles" class="row"></div>
             <div id="cotizacion_view"></div>
         </div>
         <div id="progreso">
@@ -27,6 +27,7 @@
 <script>
 var new_pax = false;
 var old_pax = false;
+var new_det = false;
 var new_iti = false;
 var valores=[];
 var html;
@@ -104,9 +105,8 @@ $("#add_pax").click(()=>{
     }
 })
 $("#add_det").click(()=>{
-    alert("deatlles");
     $("#cotizacion_detalles").load(plugin_ruta+"src/views/forms/solicitud-nueva.php");
-})
+});
 
 function seleccionar(index){
     var res=valores[index];
