@@ -1,4 +1,6 @@
 <?php
+require($_SERVER['DOCUMENT_ROOT'] . '/wp-config.php');
+require($_SERVER['DOCUMENT_ROOT'] . '/wp-load.php');
 
 class Pasajero {
     public $tabla = "pdm_pasajero";
@@ -33,16 +35,12 @@ class Pasajero {
     
     public function buscar($valor){
         global $wpdb;
-        require_once($_SERVER['DOCUMENT_ROOT'] . '/wp-config.php');
-        require_once($_SERVER['DOCUMENT_ROOT'] . '/wp-load.php');
         $sql = "SELECT pdm_pasajero_id as id, pdm_pasajero_nombres as nombres, pdm_pasajero_apellidos as apellidos, pdm_telefono_numero as telefono, pdm_correo_correo as correo FROM pdm_pasajero LEFT JOIN pdm_paxtel ON pdm_paxtel_pasajero_ID = pdm_pasajero_id LEFT JOIN pdm_telefono ON pdm_telefono_id = pdm_paxtel_telefono_ID LEFT JOIN pdm_paxcor ON pdm_paxcor_pasajero_ID = pdm_pasajero_id LEFT JOIN pdm_correo ON pdm_correo_id = pdm_paxcor_correo_ID WHERE pdm_pasajero_nombres LIKE '%$valor%' OR pdm_pasajero_apellidos LIKE '%$valor%';";
         $resultado = $wpdb->get_results($sql, OBJECT);
         echo json_encode($resultado);
     }
     public function insertar($data){
-        global $wpdb;
-        require_once($_SERVER['DOCUMENT_ROOT'] . '/wp-config.php');
-        require_once($_SERVER['DOCUMENT_ROOT'] . '/wp-load.php');
+        global $wpdb;        
         $pasajero = array(
             $this->tabla.'_nombres' => $data["nombres"],
             $this->tabla.'_apellidos' => $data["apellidos"],
@@ -74,48 +72,53 @@ class Pasajero {
                 "pdm_paxcor_correo_ID" => $corid
             ));
         }
-        $identificacion = array(
-            "numero" => $data['id_num'],
-            "f_ini" => $data['id_ini'],
-            "f_fin" => $data['id_fin'],
-            "pais" => $data['id_pais'],
-            "foto" => $data['id_foto'],
-            "tipo" => $data['id_tip'],
-        );
-        for($i=0;$i<sizeof($identificacion['numero']);$i++){
-            $wpdb->insert("pdm_identificacion", array(
-                "pdm_identificacion_tipo" => $identificacion['tipo'][$i],
-                "pdm_identificacion_numero" => $identificacion['numero'][$i],
-                "pdm_identificacion_pais" => $identificacion['pais'][$i],
-                "pdm_identificacion_emision" => $identificacion['f_ini'][$i],
-                "pdm_identificacion_vencimiento" => $identificacion['f_fin'][$i],
-                "pdm_identificacion_nota" => $identificacion['nota'][$i],
-                "pdm_identificacion_foto" => $identificacion['foto'][$i]
-            ));
-            $idid = $wpdb->insert_id;
-            $wpdb->insert("pdm_paxid", array(
-                "pdm_paxid_pasajero_ID" => $paxid,
-                "pdm_paxid_identificacion_ID" => $idid
-            ));
-        }    
-        $direccion = array(
-            "nombre" => $data['direccion'],
-            "distrito" => $data['dir_distrito'],
-            "ciudad" => $data['dir_ciudad'],
-            "pais" => $data['dir_pais']
-        );
-        for($i=0;$i<sizeof($direccion['direccion']);$i++){
-            $wpdb->insert("pdm_direccion", array(
-                "pdm_direccion_nombre" => $direccion['nombre'][$i],
-                "pdm_direccion_distrito" => $direccion['distrito'][$i],
-                "pdm_direccion_ciudad" => $direccion['ciudad'][$i],
-                "pdm_direccion_pais" => $direccion['pais'][$i],
-            ));
-            $dirid = $wpdb->insert_id;
-            $wpdb->insert("pdm_paxdir", array(
-                "pdm_paxdir_pasajero_ID" => $paxid,
-                "pdm_paxdir_direccion_ID" => $dirid,
-            ));
+        if($_POST['identificacion'] != ""){
+            $identificacion = array(
+                "numero" => $_POST['identificacion'],
+                "f_ini" => $_POST['f_emision'],
+                "f_fin" => $_POST['f_vencimiento'],
+                "pais" => $_POST['id_pais'],
+                "foto" => $_POST['id_foto'],
+                "nota" => $_POST['id_nota'],
+                "tipo" => $_POST['TipoID']
+            );
+            for($i=0;$i<sizeof($identificacion['numero']);$i++){
+                $wpdb->insert("pdm_identificacion", array(
+                    "pdm_identificacion_tipo" => $identificacion['tipo'][$i],
+                    "pdm_identificacion_numero" => $identificacion['numero'][$i],
+                    "pdm_identificacion_pais" => $identificacion['pais'][$i],
+                    "pdm_identificacion_emision" => $identificacion['f_ini'][$i],
+                    "pdm_identificacion_vencimiento" => $identificacion['f_fin'][$i],
+                    "pdm_identificacion_nota" => $identificacion['nota'][$i],
+                    "pdm_identificacion_foto" => $identificacion['foto'][$i]
+                ));
+                $idid = $wpdb->insert_id;
+                $wpdb->insert("pdm_paxid", array(
+                    "pdm_paxid_pasajero_ID" => $paxid,
+                    "pdm_paxid_identificacion_ID" => $idid
+                ));
+            }    
+        }
+        if(isset($_POST['direccion'])){
+            $direccion = array(
+                "nombre" => $_POST['direccion'],
+                "distrito" => $_POST['distrito'],
+                "ciudad" => $_POST['ciudad'],
+                "pais" => $_POST['pais']
+            );
+            for($i=0;$i<sizeof($direccion['nombre']);$i++){
+                $wpdb->insert("pdm_direccion", array(
+                    "pdm_direccion_nombre" => $direccion['nombre'][$i],
+                    "pdm_direccion_distrito" => $direccion['distrito'][$i],
+                    "pdm_direccion_ciudad" => $direccion['ciudad'][$i],
+                    "pdm_direccion_pais" => $direccion['pais'][$i],
+                ));
+                $dirid = $wpdb->insert_id;
+                $wpdb->insert("pdm_paxdir", array(
+                    "pdm_paxdir_pasajero_ID" => $paxid,
+                    "pdm_paxdir_direccion_ID" => $dirid,
+                ));
+            }
         }
         echo json_encode($data);
     }
@@ -134,19 +137,8 @@ if(isset($_POST['insertar'])){
         "nacionalidad" => $_POST['nacionalidad'],
         "nacimiento" => $_POST['nacimiento'],
         "notas" => $_POST['observacion'],
-        "direccion" => $_POST['direccion'],
-        "dir_distrito" => $_POST['distrito'],
-        "dir_ciudad" => $_POST['ciudad'],
-        "dir_pais" => $_POST['pais'],
         "telefono" => $_POST['telefono'],
         "correo" => $_POST['correo'],
-        "id_tip" => $_POST['TipoID'],
-        "id_num" => $_POST['identificacion'],
-        "id_ini" => $_POST['f_emision'],
-        "id_fin" => $_POST['f_vencimiento'],
-        "id_nota" => $_POST['id_nota'],
-        "id_pais" => $_POST['id_pais'],        
-        "id_foto" => $_POST['id_foto'],        
     );
     $pasajero->insertar($data);
 }

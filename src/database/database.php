@@ -65,7 +65,7 @@ function pdm_db_install(){
     -- -----------------------------------------------------
     CREATE TABLE IF NOT EXISTS `pdm_direccion` (
       `pdm_direccion_id` INT NOT NULL AUTO_INCREMENT,
-      `pdm_direccion_nombre` VARCHAR(150) NULL,
+      `pdm_direccion_nombre` VARCHAR(150) NOT NULL,
       `pdm_direccion_distrito` VARCHAR(150) NULL,
       `pdm_direccion_ciudad` VARCHAR(200) NULL,
       `pdm_direccion_pais` VARCHAR(200) NULL,
@@ -81,7 +81,7 @@ function pdm_db_install(){
     CREATE TABLE IF NOT EXISTS `pdm_identificacion` (
       `pdm_identificacion_id` INT NOT NULL AUTO_INCREMENT,
       `pdm_identificacion_tipo` VARCHAR(45) NULL,
-      `pdm_identificacion_numero` VARCHAR(60) NULL,
+      `pdm_identificacion_numero` VARCHAR(60) NOT NULL,
       `pdm_identificacion_pais` VARCHAR(200) NULL,
       `pdm_identificacion_emision` DATE NULL,
       `pdm_identificacion_vencimiento` DATE NULL,

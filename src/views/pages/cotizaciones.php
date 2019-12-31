@@ -14,7 +14,31 @@
             <button class="btn btn-link" id="add_pax"><i class="fa fa-plus" id="add_iti_btn"></i> Agretar Itinerario</button>
             <form id="form_pasajero"></form>
             <form id="form_solicitud"></form>
-            <div id="cotizacion_view"></div>
+            <div id="cotizacion_view">
+                <div id="pax_datos" class="card">
+                    <div class="card-header">
+                        <h5>Pasajero</h5>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Nombre: <span id="pax_nom"></span> <span id="pax_app"></span></h5>
+                        <p>Teléfono: <span id="pax_tel"></span></p><p>Correo: <span id="pax_cor"></span></p>
+                    </div>
+                </div>
+
+                <div class="card" id="det_datos">
+                    <div class="card-header">
+                        <h5>Detalles de la Solicitud</h5>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Destino: <span id="det_des"></span></h5>
+                        <p>Origen: <span id="det_ori"></span></p>
+                        <p>Pasajeros: ADT(<span id="det_adt">0</span>) CHD(<span id="det_chd">0</span>) INF(<span id="det_inf">0</span>)</p>
+                        <p>Fechas: <span id="det_fec_tip"></span>, Salida: <span id="det_fec_ini"></span>, Retorno:<span id="det_fec_ret"></span></p>
+                        <p>Servicios a Incluir: <span id="det_ser"></span></p>
+                        <p>Observaciones <span id="det_obs"></span></p>
+                    </div>
+                </div>
+            </div>
         </div>
         <div id="progreso">
             <h3>Cotizaciones En Progreso</h3>
@@ -32,6 +56,8 @@ var new_iti = false;
 var valores=[];
 var pasajero="";
 var html;
+$("#pax_datos").hide();
+$("#det_datos").hide();
 $("#add_pasajero").click(()=>{
     if(new_pax){
         $("#form_pasajero").html("");
@@ -53,14 +79,11 @@ $("#add_pasajero").click(()=>{
                         url: plugin_ruta+'src/controllers/pasajeroController.php',
                         data: 'insertar=true&'+data,
                         success: (res)=>{
-                            // console.log(res);  
+                            $("#cotizacion_view").html('<div class="alert alert-success"><h5>Pasajero Agregado</h5><p>Ahora debes           eccionarlo</p></div>');
                             $("#form_pasajero").html("");
-                            $("#add_pasajero_btn").removeClass("fa-minus");
-                            $("#add_pasajero_btn").addClass("fa-plus");
+                            $("#add_pasajero").hide();
                             new_pax = !new_pax;
-                            $("#cotizacion_view").append('<div id="datos_pax" class="card">');
-                            $("#datos_pax").append('<div class="card-header"><h5>Pasajero</h5></div>');
-                            $("#datos_pax").append('<div class="card-body"><p>Nombre: '+res.nombres+' '+res.apelldios+'</p><p>Teléfono: '+res.telefono+'</p><p>Correo: '+res.correo+'</p></div>');
+                            pasajero = res.id;               
                         }
                     });
                 }
@@ -92,7 +115,7 @@ $("#add_pax").click(()=>{
                     console.log(valores);
                     html='<table class="table table-hover"><thead><tr><th>ID</th><th>Nombre</th><th>Apellildos</th><th>Teléfono</th><th>Correo</th></tr></thead><tbody style="cursor:pointer">';
                     for(i=0;i<valores.length;i++){
-                        html+='<tr onclick="seleccionar('+i+')"><th>'+valores[i].id+'</th><td>'+valores[i].nombres+'</td><td>'+valores[i].apellidos+'</td><td>'+valores[i].telefono+'</td><td>'+valores[i].correo+'</td></tr>';
+                        html+='<tr onclick="selpax('+i+')"><th>'+valores[i].id+'</th><td>'+valores[i].nombres+'</td><td>'+valores[i].apellidos+'</td><td>'+valores[i].telefono+'</td><td>'+valores[i].correo+'</td></tr>';
                     }
                     html+='</tbody></table>';
                     $("#res_pasajero").html(html);
@@ -126,6 +149,11 @@ $("#add_det").click(()=>{
                         type:'POST',
                         data: 'pasajero='+pasajero+'&insertar=true&'+data,
                         success: (res)=>{
+                            console.log(res);
+                            $("#det_datos").show();
+                            #("#det_des").html(res.destino);
+                            #("#det_ori").html(res.origen);
+                            #("#det_").html(res.origen);
                             $("#form_solicitud").html("");
                             $("#add_det_btn").removeClass("fa-minus");
                             $("#add_det_btn").addClass("fa-plus");
@@ -142,17 +170,21 @@ $("#add_det").click(()=>{
     }
 });
 
-function seleccionar(index){
+function selpax(index){
     var res=valores[index];
-    $("#cotizacion_view").append('<div id="datos_pax" class="card">');
-    $("#datos_pax").append('<div class="card-header"><h5>Pasajero</h5></div>');
-    $("#datos_pax").append('<div class="card-body"><h5>Nombre: '+res.nombres+' '+res.apellidos+'</h5><p>Teléfono: '+res.telefono+'</p><p>Correo: '+res.correo+'</p></div>');
+    // $("#cotizacion_view").html('');
+    // $("#datos_pax").append('');
+    // $("#datos_pax").append('');
+    $("#pax_datos").show();
+    $("#pax_nom").html(res.nombres);
+    $("#pax_app").html(res.apellidos);
+    $("#pax_tel").html(res.telefono);
+    $("#pax_cor").html(res.correo);
     $("#form_pasajero").html("");
     $("#add_pax").hide();
     $("#add_pasajero").hide();
     old_pax = !old_pax;
     pasajero = res.id;
 }
-
 </script>
 
