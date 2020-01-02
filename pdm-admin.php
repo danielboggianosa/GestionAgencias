@@ -27,6 +27,7 @@
 global $wpdb;
 $pdm_db_version = '2.0';
 
+defined( 'ABSPATH' ) or die('Go Away');
 $site = ABSPATH;
 define('RUTA', "$site/wp-content/plugins/pdm-admin/");
 

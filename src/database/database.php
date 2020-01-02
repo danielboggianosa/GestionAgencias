@@ -27,6 +27,7 @@ function pdm_db_install(){
       `pdm_pasajero_nombres` VARCHAR(150) NOT NULL,
       `pdm_pasajero_apellidos` VARCHAR(150) NULL,
       `pdm_pasajero_nacionalidad` VARCHAR(200) NULL,
+      `pdm_pasajero_genero` VARCHAR(50) NULL,
       `pdm_pasajero_nacimiento` DATE NULL,
       `pdm_pasajero_notas` TEXT NULL,
       `pdm_pasajero_foto` VARCHAR(200) NULL,

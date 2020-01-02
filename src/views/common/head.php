@@ -5,11 +5,15 @@
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
+<link rel="stylesheet" href="../wp-content/plugins/pdm-admin/src/views/css/form-style-8.css">
+<link rel="stylesheet" href="../wp-content/plugins/pdm-admin/src/views/css/form-style-10.css">
+
 <script>
 var plugin_ruta = "../wp-content/plugins/pdm-admin/";
-$( function() {
+$(document).ready(()=>{
+    $( "#wpfooter" ).remove();
     $( "#tabs" ).tabs();
-} );
+});
 </script>
 
 <style>

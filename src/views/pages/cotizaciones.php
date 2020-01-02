@@ -11,9 +11,29 @@
             <button class="btn btn-link" id="add_pasajero"><i class="fa fa-plus" id="add_pasajero_btn"></i> Nuevo Pasajero</button>
             <button class="btn btn-link" id="add_pax"><i class="fa fa-plus" id="add_pax_btn"></i> Pasajero Existente</button>
             <button class="btn btn-link" id="add_det"><i class="fa fa-plus" id="add_det_btn"></i> Agregar Detalles</button>
+            <button class="btn btn-link" id="add_sol"><i class="fa fa-plus" id="add_sol_btn"></i> Cargar Solicitud</button>
             <button class="btn btn-link" id="add_pax"><i class="fa fa-plus" id="add_iti_btn"></i> Agretar Itinerario</button>
             <form id="form_pasajero"></form>
             <form id="form_solicitud"></form>
+            <div id="solicitud_buscar">
+            <div class="card-header"><h4>Buscar Solicitud</h4></div>
+                <div class="card-body">
+                    <!-- <input type="search" class="form-control" id="buscar_sol" placeholder="Escribir Nombre o Apellido del pasajero"> -->
+                    <!-- <div id="sol"></div> -->
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Pasajero</th>
+                                <th>Destino</th>
+                                <th>Fechas</th>
+                                <th>Notas</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sol_datos"></tbody>
+                    </table>
+                </div>
+            </div>
             <div id="cotizacion_view">
                 <div id="pax_datos" class="card">
                     <div class="card-header">
@@ -53,11 +73,14 @@ var new_pax = false;
 var old_pax = false;
 var new_det = false;
 var new_iti = false;
+var add_sol = false;
 var valores=[];
+var solicitud = {};
 var pasajero="";
 var html;
 $("#pax_datos").hide();
 $("#det_datos").hide();
+$("#solicitud_buscar").hide();
 $("#add_pasajero").click(()=>{
     if(new_pax){
         $("#form_pasajero").html("");
@@ -149,11 +172,13 @@ $("#add_det").click(()=>{
                         type:'POST',
                         data: 'pasajero='+pasajero+'&insertar=true&'+data,
                         success: (res)=>{
-                            console.log(res);
+                            console.log("Respuesta",res);
+                            solicitud = res;
+                            console.log("Solicitud",solicitud);
                             $("#det_datos").show();
-                            #("#det_des").html(res.destino);
-                            #("#det_ori").html(res.origen);
-                            #("#det_").html(res.origen);
+                            $("#det_des").html(solicitud.pdm_solicitud_destino);
+                            $("#det_ori").html(solicitud.pdm_solicitud_origen);
+                            $("#det_fec_tip").html(solicitud.pdm_solicitud_fecha_tipo);
                             $("#form_solicitud").html("");
                             $("#add_det_btn").removeClass("fa-minus");
                             $("#add_det_btn").addClass("fa-plus");
@@ -169,12 +194,26 @@ $("#add_det").click(()=>{
         }
     }
 });
+$("#add_sol").click(()=>{
+    if(add_sol){
+        $("#solicitud_buscar").hide();
+        $("#add_sol_btn").removeClass("fa-minus");
+        $("#add_sol_btn").addClass("fa-plus");
+        add_sol = !add_sol;
+    }
+    else{
+        $("#solicitud_busar").show()
+        $.ajax({
+            url: plugin_ruta+'src/controllers/solicitudController.php',
+            type: 'GET',
+            data: "accion='listar'&pax="+pasajero,
+            success: showSol(res),
+        })
+    }
+});
 
 function selpax(index){
     var res=valores[index];
-    // $("#cotizacion_view").html('');
-    // $("#datos_pax").append('');
-    // $("#datos_pax").append('');
     $("#pax_datos").show();
     $("#pax_nom").html(res.nombres);
     $("#pax_app").html(res.apellidos);
@@ -185,6 +224,12 @@ function selpax(index){
     $("#add_pasajero").hide();
     old_pax = !old_pax;
     pasajero = res.id;
+}
+function showSol(res){
+    var selector = "#sol_datos";
+    var salida = new Date(res.salida);
+    console.log(salida);
+    $(selector).append('<tr onclick="selSol('+i+')"><td>'+res.solId+'</td><td>'+paxNombre+'</td>'+res.destino+'<td>'+res.salida+' - '+res.retorno+'</td><td>'+res.notas+'</td></tr>')
 }
 </script>
 
