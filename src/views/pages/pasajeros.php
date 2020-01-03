@@ -72,6 +72,7 @@
                 </div>
             </div>            
         </div>
+        <!-- <button class="btn btn-danger" id="NuevoPost" onclick="agregarPost()">Crear Nuevo Post</button> -->
     </div>
 </div>
 
@@ -175,6 +176,17 @@ function agregarPax(){
             }
         });
     }
+}
+
+function agregarPost(){
+    var contenido = $("#pax_detalles").html();
+    var titulo = pax.nombres+' '+pax.apellidos;
+    $.ajax({
+        url: plugin_ruta+'src/controllers/pasajeroController.php',
+        type: 'POST',
+        data: 'addPost=true&contenido='+contenido+'&titulo='+titulo,
+        success: (res)=>{alert(res)}
+    })
 }
 </script>
 <style>

@@ -177,3 +177,37 @@ if(isset($_POST['insertar'])){
     );
     $pasajero->insertar($data);
 }
+
+if(isset($_POST['addPost'])){
+    $newPost = wp_insert_post(
+        array(
+            'ID' 					=> 0,
+            'post_author' 			=> get_current_user_id(),
+            'post_date' 			=> current_time('mysql', 0),
+            'post_content' 			=> $_POST['contenido'],
+            'post_content_filtered' => '',
+            'post_title' 			=> $_POST['titulo'],
+            'post_excerpt' 			=> '',
+            'post_status' 			=> 'draft',
+            'post_type' 			=> 'itinerario',
+            'comment_status' 		=> 'open',
+            'ping_status' 			=> '',
+            'post_password' 		=> '',
+            'post_name' 			=> '',
+            'to_ping' 				=> '',
+            'pinged'				=> '',
+            'post_modified'			=> '',
+            'post_modified_gmt'		=> '',
+            'post_parent'			=> '',
+            'menu_order'			=> '',
+            'post_mime_type'		=> '',
+            'guid'					=> '',
+            'post_category'			=> '',
+            'tags_input'			=> '',
+            'tax_input'				=> '',
+            'meta_input'			=> '',
+        ),
+        false
+    );
+    echo json_encode($newPost);
+}
