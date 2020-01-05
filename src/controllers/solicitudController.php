@@ -39,10 +39,22 @@ class Solicitud {
         $wpdb->insert($this->tabla, $data);
         echo json_encode($data);
     }
+
+    public function solicitudes($id){
+        global $wpdb;
+        $sql="SELECT pdm_solicitud_id as id, pdm_solicitud_inicio as inicio, pdm_solicitud_estado as estado, pdm_solicitud_servicios as servicios, pdm_solicitud_fecha_tipo as fechaTipo, pdm_solicitud_fecha_salida as salida, pdm_solicitud_fecha_retorno as retorno, pdm_solicitud_origen as origen, pdm_solicitud_destino as destino, pdm_solicitud_cantidad_adt as adultos, pdm_solicitud_cantidad_chd as ninos, pdm_solicitud_cantidad_inf as bebes, pdm_solicitud_descripcion as descripcion FROM pdm_solicitud WHERE pdm_solicitud_pasajero_ID = $id;";
+        $resultado = $wpdb->get_results($sql, OBJECT);
+        echo json_encode($resultado);
+    }
 }
 
 $solicitud = new Solicitud;
 
 if($_POST['insertar']){
     $solicitud->insertar();
+}
+
+if($_POST['solicitud']){
+    $id=$_POST['id'];
+    $solicitud->solicitudes($id);
 }

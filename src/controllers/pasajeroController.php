@@ -9,7 +9,7 @@ class Pasajero {
     
     public function listar(){
         global $wpdb;
-        $sql = "SELECT ".$this->tabla."_id as id, ".$this->tabla."_nombres as nombres, ".$this->tabla."_apellidos as apellidos, ".$this->tabla."_foto as foto, pdm_telefono_numero as telefono, pdm_correo_correo as correo, pdm_identificacion_numero as documento FROM ".$this->tabla." LEFT JOIN pdm_paxtel ON pdm_paxtel_pasajero_ID = ".$this->tabla."_id LEFT JOIN pdm_telefono ON pdm_telefono_id = pdm_paxtel_telefono_ID LEFT JOIN pdm_paxcor ON pdm_paxcor_pasajero_ID = ".$this->tabla."_id LEFT JOIN pdm_correo ON pdm_correo_id = pdm_paxcor_correo_ID LEFT JOIN pdm_paxid ON pdm_paxid_pasajero_ID = ".$this->tabla."_id LEFT JOIN pdm_identificacion ON pdm_identificacion_id = pdm_paxid_identificacion_ID GROUP BY id LIMIT 1500;";
+        $sql = "SELECT ".$this->tabla."_id as id, ".$this->tabla."_nombres as nombres, ".$this->tabla."_apellidos as apellidos, ".$this->tabla."_foto as foto, ".$this->tabla."_fuente as fuente, pdm_telefono_numero as telefono, pdm_correo_correo as correo, pdm_identificacion_numero as documento FROM ".$this->tabla." LEFT JOIN pdm_paxtel ON pdm_paxtel_pasajero_ID = ".$this->tabla."_id LEFT JOIN pdm_telefono ON pdm_telefono_id = pdm_paxtel_telefono_ID LEFT JOIN pdm_paxcor ON pdm_paxcor_pasajero_ID = ".$this->tabla."_id LEFT JOIN pdm_correo ON pdm_correo_id = pdm_paxcor_correo_ID LEFT JOIN pdm_paxid ON pdm_paxid_pasajero_ID = ".$this->tabla."_id LEFT JOIN pdm_identificacion ON pdm_identificacion_id = pdm_paxid_identificacion_ID GROUP BY id LIMIT 1500;";
         $resultados = $wpdb->get_results($sql, OBJECT);
         echo json_encode($resultados);
     }
@@ -149,6 +149,13 @@ class Pasajero {
         }
         echo json_encode($data);
     }
+
+    public function solicitudes($id){
+        global $wpdb;
+        $sql="SELECT pdm_solicitud_id as id, pdm_solicitud_inicio as inicio, pdm_solicitud_estado as estado, pdm_solicitud_servicios as servicios, pdm_solicitud_fecha_tipo as fechaTipo, pdm_solicitud_fecha_salida as salida, pdm_solicitud_fecha_retorno as retorno, pdm_solicitud_origen as origen, pdm_solicitud_destino as destino, pdm_solicitud_cantidad_adt as adultos, pdm_solicitud_cantidad_chd as ninos, pdm_solicitud_cantidad_inf as bebes, pdm_solicitud_descripcion as descripcion FROM pdm_solicitud WHERE pdm_solicitud_pasajero_ID = $id;";
+        $resultado = $wpdb->get_results($sql, OBJECT);
+        echo json_encode($resultado);
+    }
 }
 
 $pasajero = new Pasajero;
@@ -210,4 +217,9 @@ if(isset($_POST['addPost'])){
         false
     );
     echo json_encode($newPost);
+}
+
+if($_POST['solicitud']){
+    $id=$_POST['id'];
+    $pasajero->solicitudes($id);
 }

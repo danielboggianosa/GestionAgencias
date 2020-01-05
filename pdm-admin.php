@@ -51,30 +51,26 @@ class PasajerosDelMundo {
         add_action('init', array($this, 'itinerario_post_type'), 0);
     }
 
-    function itinerario_post_type(){
-        register_post_type('itinerario', ['public' => true, 'label' => 'Itinerarios', 'menu_icon' => 'dashicons-palmtree']);
-    }
-
     // Register Custom Post Type
-    function custom_post_type() {
+    function itinerario_post_type() {
     
         $labels = array(
-            'name'                => _x( 'products', 'Post Type General Name', 'text_domain' ),
-            'singular_name'       => _x( 'Product', 'Post Type Singular Name', 'text_domain' ),
-            'menu_name'           => __( 'Products', 'text_domain' ),
+            'name'                => _x( 'itinerario', 'Post Type General Name', 'text_domain' ),
+            'singular_name'       => _x( 'Itinerario', 'Post Type Singular Name', 'text_domain' ),
+            'menu_name'           => __( 'Itinerarios', 'text_domain' ),
             'parent_item_colon'   => __( 'Parent Item:', 'text_domain' ),
-            'all_items'           => __( 'All Items', 'text_domain' ),
-            'view_item'           => __( 'View Item', 'text_domain' ),
-            'add_new_item'        => __( 'Add New Item', 'text_domain' ),
-            'add_new'             => __( 'Add New', 'text_domain' ),
-            'edit_item'           => __( 'Edit Item', 'text_domain' ),
-            'update_item'         => __( 'Update Item', 'text_domain' ),
-            'search_items'        => __( 'Search Item', 'text_domain' ),
-            'not_found'           => __( 'Not found', 'text_domain' ),
-            'not_found_in_trash'  => __( 'Not found in Trash', 'text_domain' ),
+            'all_items'           => __( 'Todos', 'text_domain' ),
+            'view_item'           => __( 'Ver Itinerario', 'text_domain' ),
+            'add_new_item'        => __( 'Nuevo Itinerario', 'text_domain' ),
+            'add_new'             => __( 'Nuevo', 'text_domain' ),
+            'edit_item'           => __( 'Editar', 'text_domain' ),
+            'update_item'         => __( 'Actualizar', 'text_domain' ),
+            'search_items'        => __( 'Buscar', 'text_domain' ),
+            'not_found'           => __( 'No se encontró', 'text_domain' ),
+            'not_found_in_trash'  => __( 'No se encontró en la papelera', 'text_domain' ),
         );
         $args = array(
-            'label'               => __( 'Products', 'text_domain' ),
+            'label'               => __( 'Itinerarios', 'text_domain' ),
             'description'         => __( 'Post Type Description', 'text_domain' ),
             'labels'              => $labels,
             'supports'            => array( ),
@@ -83,17 +79,19 @@ class PasajerosDelMundo {
             'public'              => true,
             'show_ui'             => true,
             'show_in_menu'        => true,
-            'show_in_nav_menus'   => true,
+            'show_in_nav_menus'   => false,
             'show_in_admin_bar'   => true,
             'menu_position'       => 5,
-            'menu_icon'           => 'dashicons-cart',
+            'menu_icon'           => 'dashicons-palmtree',
             'can_export'          => true,
             'has_archive'         => true,
             'exclude_from_search' => false,
             'publicly_queryable'  => true,
             'capability_type'     => 'page',
+            'rewrite'             => true,
+            'supports'            => array('title', 'editor', 'thumbnail', 'comments', 'slug'),
         );
-        register_post_type( 'Products', $args );
+        register_post_type( 'itinerario', $args );
     
     }
  

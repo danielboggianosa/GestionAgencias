@@ -12,9 +12,10 @@
             <button class="btn btn-link" id="add_pax"><i class="fa fa-plus" id="add_pax_btn"></i> Pasajero Existente</button>
             <button class="btn btn-link" id="add_det"><i class="fa fa-plus" id="add_det_btn"></i> Agregar Detalles</button>
             <button class="btn btn-link" id="add_sol"><i class="fa fa-plus" id="add_sol_btn"></i> Cargar Solicitud</button>
-            <button class="btn btn-link" id="add_pax"><i class="fa fa-plus" id="add_iti_btn"></i> Agretar Itinerario</button>
+            <button class="btn btn-link" id="add_iti"><i class="fa fa-plus" id="add_iti_btn"></i> Agretar Itinerario</button>
             <form id="form_pasajero"></form>
             <form id="form_solicitud"></form>
+            <div id="dialogo"></div>
             <div id="solicitud_buscar">
             <div class="card-header"><h4>Buscar Solicitud</h4></div>
                 <div class="card-body">
@@ -55,7 +56,7 @@
                         <p>Pasajeros: ADT(<span id="det_adt">0</span>) CHD(<span id="det_chd">0</span>) INF(<span id="det_inf">0</span>)</p>
                         <p>Fechas: <span id="det_fec_tip"></span>, Salida: <span id="det_fec_ini"></span>, Retorno:<span id="det_fec_ret"></span></p>
                         <p>Servicios a Incluir: <span id="det_ser"></span></p>
-                        <p>Observaciones <span id="det_obs"></span></p>
+                        <p>Observaciones: <span id="det_obs"></span></p>
                     </div>
                 </div>
             </div>
@@ -77,10 +78,16 @@ var add_sol = false;
 var valores=[];
 var solicitud = {};
 var pasajero="";
-var html;
+var html, sol;
 $("#pax_datos").hide();
 $("#det_datos").hide();
 $("#solicitud_buscar").hide();
+$("#dialogo").dialog({
+    autoOpen:false,
+    width:600,
+    height:500,
+    modal:true,
+})
 $("#add_pasajero").click(()=>{
     if(new_pax){
         $("#form_pasajero").html("");
@@ -205,12 +212,13 @@ $("#add_sol").click(()=>{
         $("#solicitud_busar").show()
         $.ajax({
             url: plugin_ruta+'src/controllers/solicitudController.php',
-            type: 'GET',
-            data: "accion='listar'&pax="+pasajero,
-            success: showSol(res),
+            type: 'POST',
+            data: "solicitud="+true+"&id="+pasajero,
+            success: (res)=>showSol(res),
         })
     }
 });
+$("#add_iti").click(()=>agregarItinerario())
 
 function selpax(index){
     var res=valores[index];
@@ -226,10 +234,36 @@ function selpax(index){
     pasajero = res.id;
 }
 function showSol(res){
-    var selector = "#sol_datos";
-    var salida = new Date(res.salida);
-    console.log(salida);
-    $(selector).append('<tr onclick="selSol('+i+')"><td>'+res.solId+'</td><td>'+paxNombre+'</td>'+res.destino+'<td>'+res.salida+' - '+res.retorno+'</td><td>'+res.notas+'</td></tr>')
+    var selector = "#form_solicitud";
+    sol = eval(res);
+    console.log(sol);
+    html='<table class="table table-hover"><thead><tr><th>ID</th><th>ESTADO</th><th>DESTINO</th><th>SERVICIOS</th><th>DESCRIPCION</th></tr><tbody>';
+    for(i=0;i<sol.length;i++){
+        html+='<tr onclick="seleccionarSolicitud('+sol[i].id+')"><td>'+sol[i].id+'</td><td>'+sol[i].estado+'</td><td>'+sol[i].destino+'</td><td>'+sol[i].servicios+'</td><td>'+sol[i].descripcion+'</td></tr>';
+    }
+    html+='</tbody></table>';
+    $(selector).html(html);
+}
+function seleccionarSolicitud(index){
+    s = sol[index]; 
+    $("#form_solicitud").html('');
+    $("#det_datos").show();
+    $("#add_det").hide();
+    $("#add_sol").hide();
+    $("#det_des").html(s.destino);
+    $("#det_ori").html(s.origen);
+    $("#det_adt").html(s.adultos);
+    $("#det_chd").html(s.ninos);
+    $("#det_inf").html(s.bebes);
+    $("#det_fec_tip").html(s.fechaTipo);
+    $("#det_fec_sal").html(s.salida);
+    $("#det_fec_ret").html(s.retorno);
+    $("#det_ser").html(s.servicios);
+    $("#det_obs").html(s.descripcion);
+}
+function agregarItinerario(){
+    $("#dialogo").dialog('open');
+    $("#dialogo").load(plugin_ruta+'src/views/forms/itinerario.php');
 }
 </script>
 
