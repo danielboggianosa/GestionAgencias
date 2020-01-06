@@ -1,5 +1,5 @@
-<fieldset>
-<legend>Dirección</legend>
+<div class="row">
+<h4 class="col-12">Dirección</h4>
 <div id="dir_dinamica">
     <label for="direccion">Dirección:</label>
     <input class="form-control" type="text" name="direccion[]" placeholder="Nombre de la calle, Número, Urb."/>
@@ -8,7 +8,7 @@
     <select name="pais[]" class="form-control" id="pais"></select>
 </div>
 <input class="btn-link" type="button" value="Agregar Otra Dirección" onClick="DireccionDinamica('dir_dinamica');">
-</fieldset>
+</div>
     
 <script>
     var dir_counter = 1;

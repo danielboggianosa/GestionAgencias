@@ -1,7 +1,7 @@
 <div id="id_dinamico">
-<div class="panel panel-default">
-    <legend class="card-header">Identificación</legend>
-<div class="card-body">
+<div class="row">
+    <h4 class="col-12">Identificación</h4>
+<div class="">
 <br><label for="radio">Tipo de Identificación</label>
 <div class="radio" id="radio">
     <label>    

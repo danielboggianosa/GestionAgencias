@@ -12,7 +12,7 @@
             <button class="btn btn-link" id="add_pax"><i class="fa fa-plus" id="add_pax_btn"></i> Pasajero Existente</button>
             <button class="btn btn-link" id="add_det"><i class="fa fa-plus" id="add_det_btn"></i> Agregar Detalles</button>
             <button class="btn btn-link" id="add_sol"><i class="fa fa-plus" id="add_sol_btn"></i> Cargar Solicitud</button>
-            <button class="btn btn-link" id="add_iti"><i class="fa fa-plus" id="add_iti_btn"></i> Agretar Itinerario</button>
+    
             <form id="form_pasajero"></form>
             <form id="form_solicitud"></form>
             <div id="dialogo"></div>
@@ -36,28 +36,54 @@
                 </div>
             </div>
             <div id="cotizacion_view">
-                <div id="pax_datos" class="card">
-                    <div class="card-header">
-                        <h5>Pasajero</h5>
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title">Nombre: <span id="pax_nom"></span> <span id="pax_app"></span></h5>
-                        <p>Teléfono: <span id="pax_tel"></span></p><p>Correo: <span id="pax_cor"></span></p>
-                    </div>
+                <div id="pax_datos" class="form-style-8">
+                    <h2>Pasajero</h2>
+                    <h4><span id="pax_nom"></span> <span id="pax_app"></span></h4>
+                    <p class="d-flex justify-content-between">
+                    <button class="btn">
+                        <i class="fa fa-phone"></i> <span id="pax_tel"></span>
+                    </button>
+                    <button class="btn">
+                        <i class="fa fa-envelope"></i> <span id="pax_cor"></span></p>
+                    </button>
                 </div>
 
-                <div class="card" id="det_datos">
-                    <div class="card-header">
-                        <h5>Detalles de la Solicitud</h5>
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title">Destino: <span id="det_des"></span></h5>
-                        <p>Origen: <span id="det_ori"></span></p>
-                        <p>Pasajeros: ADT(<span id="det_adt">0</span>) CHD(<span id="det_chd">0</span>) INF(<span id="det_inf">0</span>)</p>
-                        <p>Fechas: <span id="det_fec_tip"></span>, Salida: <span id="det_fec_ini"></span>, Retorno:<span id="det_fec_ret"></span></p>
-                        <p>Servicios a Incluir: <span id="det_ser"></span></p>
-                        <p>Observaciones: <span id="det_obs"></span></p>
-                    </div>
+                <div id="det_datos" class="form-style-8">
+                    <h2>Detalles de la Solicitud</h2>
+                    <h4><span id="det_des"></span></h4>
+                    <p>Origen: <span id="det_ori"></span></p>
+                    <p>Pasajeros: ADT(<span id="det_adt">0</span>) CHD(<span id="det_chd">0</span>) INF(<span id="det_inf">0</span>)</p>
+                    <p>Fechas: <span id="det_fec_tip"></span>, Salida: <span id="det_fec_ini"></span>, Retorno:<span id="det_fec_ret"></span></p>
+                    <p>Servicios a Incluir: <span id="det_ser"></span></p>
+                    <p>Observaciones: <span id="det_obs"></span></p>
+                </div>
+
+                <button class="btn btn-link" id="add_ser"><i class="fa fa-plus" id="add_ser_btn"></i> Agregar Servicio</button>
+                <div id="det_itinerario" class="form-style-8">
+                    <h2>Itinerario</h2>
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>DÍA</th>
+                                <th>INICIO</th>
+                                <th>FINAL</th>
+                                <th>TÍTULO</th>
+                                <th>DESCRIPCION</th>
+                                <th>OPCIONES</th>
+                            </tr>
+                        </thead>
+                        <tbody id="servicios">
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>Costo:</th>
+                                <th><span id="costoServicio"></span></th>
+                                <th>Precio:</th>
+                                <th><span id="precioServicio"></span></th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </div>
             </div>
         </div>
@@ -78,21 +104,19 @@ var add_sol = false;
 var valores=[];
 var solicitud = {};
 var pasajero="";
-var html, sol;
+var html, sol, tituloDialogo, servicios=[], serIndex = 0, serModIndex, serTotal=0, serCosto=0;
 $("#pax_datos").hide();
 $("#det_datos").hide();
+$("#det_itinerario").hide();
+$("#add_det").hide();
+$("#add_sol").hide();
+$("#add_ser").hide();
 $("#solicitud_buscar").hide();
-$("#dialogo").dialog({
-    autoOpen:false,
-    width:600,
-    height:500,
-    modal:true,
-})
 $("#add_pasajero").click(()=>{
     if(new_pax){
         $("#form_pasajero").html("");
-        $("#add_pasajero_btn").removeClass("fa-minus");
-        $("#add_pasajero_btn").addClass("fa-plus");
+        $("#form_pasajero")[0].className = "";
+        $("#add_pasajero_btn")[0].className = "fa fa-plus";
         new_pax = !new_pax;
     }
     else{        
@@ -109,9 +133,11 @@ $("#add_pasajero").click(()=>{
                         url: plugin_ruta+'src/controllers/pasajeroController.php',
                         data: 'insertar=true&'+data,
                         success: (res)=>{
-                            $("#cotizacion_view").html('<div class="alert alert-success"><h5>Pasajero Agregado</h5><p>Ahora debes           eccionarlo</p></div>');
+                            $("#cotizacion_view").html('<div class="alert alert-success"><h5>Pasajero Agregado</h5><p>Ahora debes seleccionarlo</p></div>');
                             $("#form_pasajero").html("");
                             $("#add_pasajero").hide();
+                            $("#add_det").show();
+                            $("#add_sol").show();
                             new_pax = !new_pax;
                             pasajero = res.id;               
                         }
@@ -134,6 +160,7 @@ $("#add_pax").click(()=>{
     }
     else{
         $("#form_pasajero").load(plugin_ruta+"src/views/forms/pasajero-existente.php",()=>{
+            $("#form_pasajero").addClass('form-style-8');
             $("#form_pasajero").append('<div id="res_pasajero"></div>');
             $("#buscar_pax").keyup(()=>{
                 $.ajax({
@@ -150,7 +177,7 @@ $("#add_pax").click(()=>{
                     html+='</tbody></table>';
                     $("#res_pasajero").html(html);
                 });                
-            });
+            });            
         });
         $("#add_pax_btn").removeClass("fa-plus");
         $("#add_pax_btn").addClass("fa-minus");
@@ -218,7 +245,19 @@ $("#add_sol").click(()=>{
         })
     }
 });
-$("#add_iti").click(()=>agregarItinerario())
+$("#add_ser").click(()=>{
+    $("#dialogo").dialog({
+        width:600,
+        height:500,
+        modal:true,
+        title: 'Nuevo Servicio',
+        buttons: {
+                    cancel: ()=>$("#dialogo").dialog('close'),
+                    'Agregar Servicio': agregarServicio,
+                },
+    })
+    $("#dialogo").load(plugin_ruta+'src/views/forms/servicio.php');
+})
 
 function selpax(index){
     var res=valores[index];
@@ -230,8 +269,11 @@ function selpax(index){
     $("#form_pasajero").html("");
     $("#add_pax").hide();
     $("#add_pasajero").hide();
+    $("#add_det").show();
+    $("#add_sol").show();
     old_pax = !old_pax;
     pasajero = res.id;
+    $("#form_pasajero").removeClass('form-style-8');
 }
 function showSol(res){
     var selector = "#form_solicitud";
@@ -248,6 +290,7 @@ function seleccionarSolicitud(index){
     s = sol[index]; 
     $("#form_solicitud").html('');
     $("#det_datos").show();
+    $("#add_ser").show();
     $("#add_det").hide();
     $("#add_sol").hide();
     $("#det_des").html(s.destino);
@@ -261,9 +304,97 @@ function seleccionarSolicitud(index){
     $("#det_ser").html(s.servicios);
     $("#det_obs").html(s.descripcion);
 }
-function agregarItinerario(){
-    $("#dialogo").dialog('open');
-    $("#dialogo").load(plugin_ruta+'src/views/forms/itinerario.php');
+function agregarServicio(){
+    var servicio = $("#nuevoServicio").serializeArray();
+    var n={};
+    for(i=0;i<servicio.length;i++){
+        n[servicio[i].name] = servicio[i].value;
+    }
+    servicios.push(n)
+    index = servicios.indexOf(n);
+    servicios[index]['id'] = serIndex;
+    console.log(servicios);
+    $("#servicios").append('<tr id="servicio_'+serIndex+'"><td>'+n.dia+'</td><td>'+n.hInicio+'</td><td>'+n.hFinal+'</td><td>'+n.servicio+'</td><td>'+n.descripcion+'</td><td><button class="btn btn-link" onclick="editarServicio('+serIndex+')"><i class="fa fa-eye"></i></button><button class="btn btn-link" onclick="borrarServicio('+serIndex+')"><i class="fa fa-trash"></i></button><button class="btn btn-link" onclick="editarServicio('+serIndex+')"><i class="fa fa-edit"></i></button></td></tr>');
+    $("#det_itinerario").show();
+    $("#dialogo").dialog('close');
+    serIndex++;
+    serTotal += n.precio*1;
+    serCosto += n.costo*1;
+    $("#precioServicio").html(serTotal+' '+n.moneda);
+    $("#costoServicio").html(serCosto+' '+n.moneda);
+}
+function borrarServicio(index){
+    for(i=0;i<servicios.length;i++){
+        if(servicios[i].id == index){
+            serTotal -= servicios[i].precio*1
+            serCosto -= servicios[i].costo*1
+            $("#precioServicio").html(serTotal);
+            $("#costoServicio").html(serCosto);
+            servicios.splice(i, 1);
+            $("#servicio_"+index).remove();
+        }
+    }
+    console.log(servicios);
+}
+function editarServicio(index){
+    for(i=0;i<servicios.length;i++){
+        if(servicios[i].id == index){
+            n = servicios[i];
+            serCosto -= n.costo*1;
+            serTotal -= n.precio*1;
+            serModIndex = i;
+            $("#dialogo").dialog({
+                width:600,
+                height:500,
+                modal:true,
+                title: 'Nuevo Servicio',
+                buttons: {
+                            cancel: ()=>{
+                                        serCosto += n.costo*1;
+                                        serTotal += n.precio*1;
+                                        $("#dialogo").dialog('close')
+                                    },
+                            'Editar Servicio': modificarServicio,
+                        },
+            });
+            $("#dialogo").load(plugin_ruta+'src/views/forms/servicio.php', ()=>{
+                $("input[name='dia']").val(n.dia);
+                $("input[name='hInicio']").val(n.hInicio);
+                $("input[name='hFinal']").val(n.hFinal);
+                $("input[name='servicio']").val(n.servicio);
+                $("input[name='foto']").val(n.foto);
+                $("textarea[name='descripcion']").val(n.descripcion);
+                $("input[name='operador']").val(n.operador);
+                $("select[name='moneda']").val(n.moneda);
+                $("input[name='costo']").val(n.costo);
+                $("input[name='precio']").val(n.precio);
+            });
+        }
+    }
+}
+function modificarServicio(){
+    i = serModIndex;
+    servicios[i].dia = $("input[name='dia']").val();
+    servicios[i].hInicio = $("input[name='hInicio']").val();
+    servicios[i].hFinal = $("input[name='hFinal']").val();
+    servicios[i].servicio = $("input[name='servicio']").val();
+    servicios[i].foto = $("input[name='foto']").val();
+    servicios[i].descripcion = $("textarea[name='descripcion']").val();
+    servicios[i].operador = $("input[name='operador']").val();
+    servicios[i].moneda = $("select[name='moneda']").val();
+    servicios[i].costo = $("input[name='costo']").val();
+    servicios[i].precio = $("input[name='precio']").val();
+    n = servicios[i];
+    $("#servicio_"+servicios[i].id).html('<td>'+n.dia+'</td><td>'+n.hInicio+'</td><td>'+n.hFinal+'</td><td>'+n.servicio+'</td><td>'+n.descripcion+'</td><td><button class="btn btn-link" onclick="editarServicio('+servicios[i].id+')"><i class="fa fa-eye"></i></button><button class="btn btn-link" onclick="borrarServicio('+servicios[i].id+')"><i class="fa fa-trash"></i></button><button class="btn btn-link" onclick="editarServicio('+servicios[i].id+')"><i class="fa fa-edit"></i></button></td>')
+    console.log(servicios);
+    serCosto += n.costo*1;
+    serTotal += n.precio*1;    
+    $("#precioServicio").html(serTotal);
+    $("#costoServicio").html(serCosto);
+    $("#dialogo").dialog('close');
 }
 </script>
+
+
+
 

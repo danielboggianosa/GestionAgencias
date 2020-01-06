@@ -166,5 +166,25 @@ function pdm_db_install(){
     ENGINE = InnoDB;";
     dbDelta( $sql );
 
+    // -- -----------------------------------------------------
+    // -- Table `pdm`.`pdm_servicios`
+    // -- -----------------------------------------------------
+    $sql ="CREATE TABLE IF NOT EXISTS `pdm_servicios` (
+      `pdm_servicios_id` INT NOT NULL AUTO_INCREMENT,
+      `pdm_servicios_itinerario_ID` INT NOT NULL,
+      `pdm_servicios_dia` INT NULL,
+      `pdm_servicios_hora_inicio` TIME NULL,
+      `pdm_servicios_hora_final` TIME NULL,
+      `pdm_servicios_servicio` VARCHAR(200) NOT NULL,
+      `pdm_servicios_descripcion` TEXT NULL,
+      `pdm_servicios_foto` TEXT NULL,
+      `pdm_servicios_operador` VARCHAR(200) NULL,
+      `pdm_servicios_moneda` VARCHAR(50) NULL,
+      `pdm_servicios_costo` DECIMAL(10,2) NULL,
+      `pdm_servicios_precio` DECIMAL(10,2) NULL,
+      PRIMARY KEY (`pdm_servicio_id`))
+    $charset_collate
+    ENGINE = InnoDB;";
+    dbDelta( $sql );
 }
 ?>
