@@ -14,7 +14,7 @@ function pdm_db_install(){
     // -- MySQL Workbench Forward Engineering
     
     // -- -----------------------------------------------------
-    // -- Table `pdm_pasajero` PASAJEROS
+    // -- Table `pdm_operador` PASAJEROS
     // -- -----------------------------------------------------
     
     $sql = "CREATE TABLE IF NOT EXISTS `pdm_pasajero` (
@@ -153,6 +153,16 @@ function pdm_db_install(){
     dbDelta( $sql );
 
     // -- -----------------------------------------------------
+    // -- Table `pdm_soliti` SOL->ITINERARIO
+    // -- -----------------------------------------------------
+    $sql = "CREATE TABLE IF NOT EXISTS `pdm_soliti` (
+      `pdm_soliti_solicitud_ID` INT NOT NULL,
+      `pdm_soliti_itinerario_ID` INT NOT NULL)
+    $charset_collate
+    ENGINE = InnoDB;";
+    dbDelta( $sql );
+
+    // -- -----------------------------------------------------
     // -- Table `pdm`.`pdm_solicitud_historial`
     // -- -----------------------------------------------------
     $sql ="CREATE TABLE IF NOT EXISTS `pdm_solicitud_historial` (
@@ -169,22 +179,105 @@ function pdm_db_install(){
     // -- -----------------------------------------------------
     // -- Table `pdm`.`pdm_servicios`
     // -- -----------------------------------------------------
-    $sql ="CREATE TABLE IF NOT EXISTS `pdm_servicios` (
-      `pdm_servicios_id` INT NOT NULL AUTO_INCREMENT,
-      `pdm_servicios_itinerario_ID` INT NOT NULL,
-      `pdm_servicios_dia` INT NULL,
-      `pdm_servicios_hora_inicio` TIME NULL,
-      `pdm_servicios_hora_final` TIME NULL,
-      `pdm_servicios_servicio` VARCHAR(200) NOT NULL,
-      `pdm_servicios_descripcion` TEXT NULL,
-      `pdm_servicios_foto` TEXT NULL,
-      `pdm_servicios_operador` VARCHAR(200) NULL,
-      `pdm_servicios_moneda` VARCHAR(50) NULL,
-      `pdm_servicios_costo` DECIMAL(10,2) NULL,
-      `pdm_servicios_precio` DECIMAL(10,2) NULL,
+    $sql ="CREATE TABLE IF NOT EXISTS `pdm_servicio` (
+      `pdm_servicio_id` INT NOT NULL AUTO_INCREMENT,
+      `pdm_servicio_hora_inicio` TIME NULL,
+      `pdm_servicio_hora_final` TIME NULL,
+      `pdm_servicio_nombre` VARCHAR(200) NOT NULL,
+      `pdm_servicio_descripcion` TEXT NULL,
+      `pdm_servicio_foto` TEXT NULL,
+      `pdm_servicio_moneda` VARCHAR(50) NULL,
+      `pdm_servicio_costo` DECIMAL(10,2) NULL,
+      `pdm_servicio_precio` DECIMAL(10,2) NULL,
+      `pdm_servicio_operador_ID` INT NOT NULL,
       PRIMARY KEY (`pdm_servicio_id`))
     $charset_collate
     ENGINE = InnoDB;";
     dbDelta( $sql );
+
+    // -- -----------------------------------------------------
+    // -- Table `pdm`.`pdm_operador` OPERADORES
+    // -- -----------------------------------------------------
+    $sql="CREATE TABLE IF NOT EXISTS `pdm_operador` (
+      `pdm_operador_id` INT NOT NULL AUTO_INCREMENT,
+      `pdm_operador_nombre` VARCHAR(200) NOT NULL,
+      `pdm_operador_tipo` VARCHAR(200) NULL,
+      `pdm_operador_doc_tipo` VARCHAR(20) NULL,
+      `pdm_operador_doc_numero` VARCHAR(100) NULL,
+      `pdm_operador_descripcion` TEXT NULL,
+      `pdm_operador_etiquetas` TEXT NULL,
+      `pdm_operador_creado` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (`pdm_operador_id`))
+      $charset_collate
+      ENGINE = InnoDB;";
+      dbDelta( $sql );
+    
+    // -- -----------------------------------------------------
+    // -- Table `pdm_optel` OP->TELEFONO
+    // -- -----------------------------------------------------
+    $sql="CREATE TABLE IF NOT EXISTS `pdm_optel` (
+      `pdm_optel_operador_ID` INT NOT NULL,
+      `pdm_optel_telefono_ID` INT NOT NULL)
+    $charset_collate
+    ENGINE = InnoDB;";
+    dbDelta( $sql );
+
+    // -- -----------------------------------------------------
+    // -- Table `pdm_opcor` OP->CORREO
+    // -- -----------------------------------------------------
+    $sql = "CREATE TABLE IF NOT EXISTS `pdm_opcor` (
+      `pdm_opcor_operador_ID` INT NOT NULL,
+      `pdm_opcor_correo_ID` INT NOT NULL)
+    $charset_collate
+    ENGINE = InnoDB;";
+    dbDelta( $sql );
+
+    // -- -----------------------------------------------------
+    // -- Table `pdm_opdir` OP->DIRECCION
+    // -- -----------------------------------------------------
+    $sql = "CREATE TABLE IF NOT EXISTS `pdm_opdir` (
+      `pdm_opdir_operador_ID` INT NOT NULL,
+      `pdm_opdir_direccion_ID` INT NOT NULL)
+    $charset_collate
+    ENGINE = InnoDB;";
+    dbDelta( $sql );
+
+    // -- -----------------------------------------------------
+    // -- Table `pdm_opser` OP->SERVICIOS
+    // -- -----------------------------------------------------
+    $sql = "CREATE TABLE IF NOT EXISTS `pdm_opdir` (
+      `pdm_opdir_operador_ID` INT NOT NULL,
+      `pdm_opdir_servicio_ID` INT NOT NULL)
+    $charset_collate
+    ENGINE = InnoDB;";
+    dbDelta( $sql );
+
+    // -- -----------------------------------------------------
+    // -- Table `pdm_itinerario` ITINERARIOS
+    // -- -----------------------------------------------------
+    $sql = "CREATE TABLE IF NOT EXISTS `pdm_itinerario` (
+      `pdm_itinerario_id` INT NOT NULL AUTO_INCREMENT,
+      `pdm_itinerario_nombre` VARCHAR(200) NOT NULL,
+      `pdm_itinerario_moneda` VARCHAR(10) NULL,
+      `pdm_itinerario_creado` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      `pdm_itinerario_modificado` TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP,
+      `pdm_itinerario_usuario_ID` INT(11) NOT NULL,
+      PRIMARY KEY (`pdm_itinerario_id`))
+      $charset_collate
+      ENGINE = InnoDB;";
+      dbDelta( $sql );
+
+      // -- -----------------------------------------------------
+      // -- Table `pdm_itidet` ITI->DETALLES
+      // -- -----------------------------------------------------
+      $sql="CREATE TABLE IF NOT EXISTS `pdm_itidet` (
+        `pdm_itidet_itinerario_ID` INT NOT NULL,
+        `pdm_itidet_dia` INT NOT NULL,
+        `pdm_itidet_servicio_ID` INT NOT NULL,
+      )
+      $charset_collate
+      ENGINE = InnoDB;";
+      dbDelta( $sql );
+
 }
 ?>
