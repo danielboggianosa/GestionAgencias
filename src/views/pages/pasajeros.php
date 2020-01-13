@@ -137,7 +137,7 @@ $(document).ready(()=>{
     $.ajax({
         url: plugin_ruta+'src/controllers/pasajeroController.php',
         type: 'POST',
-        data: 'listar=true',
+        data: 'listar=true&estado="PASAJERO"',
         success: (res)=>{listarPax(res)}
     });
 
@@ -178,7 +178,7 @@ function listarPax(r){
 function seleccionarPax(id){
     $.ajax({
         url: plugin_ruta+'src/controllers/pasajeroController.php',
-        type: 'POST',
+        type: 'GET',
         data: 'obtener='+id,
         success: (res)=>{
             pax = eval(res)[0];

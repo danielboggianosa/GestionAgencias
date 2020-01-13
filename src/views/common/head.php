@@ -7,6 +7,9 @@
 
 <link rel="stylesheet" href="../wp-content/plugins/pdm-admin/src/views/css/form-style-8.css">
 <link rel="stylesheet" href="../wp-content/plugins/pdm-admin/src/views/css/form-style-10.css">
+<link rel="stylesheet" href="../wp-content/plugins/pdm-admin/src/views/css/sb-admin-2.css">
+<link rel="stylesheet" href="../wp-content/plugins/pdm-admin/src/views/css/sb-admin-2.css">
+<link rel="stylesheet" href="//cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
 
 <script>
 var plugin_ruta = "../wp-content/plugins/pdm-admin/";
@@ -15,6 +18,24 @@ $(document).ready(()=>{
     $( "#tabs" ).tabs();
 });
 </script>
+
+<script src="../wp-content/plugins/pdm-admin/src/views/js/jquery.timeago.js" type="text/javascript"></script>
+
+<!-- <script src="../wp-content/plugins/pdm-admin/src/views/js/jquery.min.js"></script> -->
+<script src="../wp-content/plugins/pdm-admin/src/views/js/bootstrap.bundle.js"></script>
+
+<!-- Core plugin JavaScript-->
+<script src="../wp-content/plugins/pdm-admin/src/views/js/jquery.easing.js"></script>
+
+<!-- Custom scripts for all pages-->
+<script src="../wp-content/plugins/pdm-admin/src/views/js/sb-admin-2.js"></script>
+
+<!-- Page level plugins -->
+<script src="//cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+<script src="../wp-content/plugins/pdm-admin/src/views/datatables/dataTables.bootstrap4.min.js"></script>
+
+<!-- Page level custom scripts -->
+<script src="../wp-content/plugins/pdm-admin/src/views/js/demo/datatables-demo.js"></script>
 
 <style>
 .hidden{

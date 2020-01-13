@@ -1,5 +1,4 @@
 <?php
-add_action( 'admin_menu', 'pdm_add_menu_page' );
 //add_action( 'admin_menu', 'pdm_add_submenu_page' );
 
 function pdm_add_menu_page() {
@@ -31,33 +30,33 @@ function pdm_add_menu_page() {
         'dashicons-twitter',
         9
     );
-    // add_menu_page(
-    //     'Productos',
-    //     'Productos',
-    //     $usuario["colaborador"], 
-    //     'pdm-productos', 
-    //     'pdm_productos',
-    //     'dashicons-products',
-    //     10
-    // );
-    // add_menu_page(
-    //     'Proveedores',
-    //     'Proveedores',
-    //     $usuario["colaborador"], 
-    //     'pdm-proveedores', 
-    //     'pdm_proveedores',
-    //     'dashicons-businessman',
-    //     12
-    // );
-    // add_menu_page(
-    //     'Ventas',
-    //     'Ventas',
-    //     $usuario["colaborador"], 
-    //     'pdm-ventas', 
-    //     'pdm_ventas',
-    //     'dashicons-cart',
-    //     13
-    // );
+    add_menu_page(
+        'CRM',
+        'CRM',
+        $usuario["colaborador"], 
+        'pdm-crm', 
+        'pdm_crm',
+        'dashicons-buddicons-buddypress-logo',
+        6
+    );
+    add_menu_page(
+        'Operadores',
+        'Operadores',
+        $usuario["colaborador"], 
+        'pdm-operador', 
+        'pdm_operador',
+        'dashicons-businessman',
+        12
+    );
+    add_menu_page(
+        'Desarrollador',
+        'Desarrollador',
+        $usuario["administrador"], 
+        'pdm-desarrollador', 
+        'pdm_desarrollador',
+        'dashicons-image-filter',
+        13
+    );
     // add_menu_page(
     //     'Compras',
     //     'Compras',
@@ -113,15 +112,15 @@ function pdm_cotizaciones(){
 function pdm_pasajeros(){
     include RUTA."src/views/pages/pasajeros.php";
 }
-// function pdm_productos(){
-//     include RUTA."views/pages/productos.php";
-// }
-// function pdm_proveedores(){
-//     include RUTA."views/pages/proveedores.php";
-// }
-// function pdm_ventas(){
-//     include RUTA."views/pages/ventas.php";
-// }
+function pdm_crm(){
+    include RUTA."src/views/pages/crm.php";
+}
+function pdm_operador(){
+    include RUTA."src/views/pages/operador.php";
+}
+function pdm_desarrollador(){
+    include RUTA."src/views/pages/desarrollador.php";
+}
 // function pdm_compras(){
 //     include RUTA."views/pages/compras.php";
 // }

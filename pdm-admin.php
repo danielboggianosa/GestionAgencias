@@ -24,6 +24,8 @@
  * Domain Path: /languages
  */
 
+require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+
 global $wpdb;
 $pdm_db_version = '2.0';
 
@@ -31,24 +33,20 @@ defined( 'ABSPATH' ) or die('Go Away');
 $site = ABSPATH;
 define('RUTA', "$site/wp-content/plugins/pdm-admin/");
 
-/*** LLAMADO A TODOS LOS ARCHIVOS DE CONFIGURACIÓN  ***/
-
-require RUTA."src/init/logindetails.php";
 //require RUTA."src/init/remove-menu.php";
-require RUTA."src/init/add-menu.php";
 require RUTA."src/init/funciones.php";
-require RUTA."src/database/database.php";
-
-//COMPORBAR SI LAS TABLAS YA ESTÁN PRESENTES
-$sql="DESCRIBE ".DB_NAME.".pdm_pasajero";
-$resultado = $wpdb->get_results($sql, OBJECT);
-if(sizeof($resultado)==0){
-    register_activation_hook( __FILE__, 'pdm_db_install' );
-}
 
 class PasajerosDelMundo {
+    
+    /*** LLAMADO A TODOS LOS ARCHIVOS DE CONFIGURACIÓN  ***/
     function __construct(){
+        require RUTA."src/init/logindetails.php";     
         add_action('init', array($this, 'itinerario_post_type'), 0);
+        add_action('init', array($this, 'instalar_db'), 0);
+        add_action('init', array($this, 'crear_menus'), 0);
+    }
+    
+    public function activation(){
     }
 
     // Register Custom Post Type
@@ -94,9 +92,40 @@ class PasajerosDelMundo {
         register_post_type( 'itinerario', $args );
     
     }
+    
+    //COMPORBAR SI LAS TABLAS YA ESTÁN PRESENTES
+    function instalar_db(){
+        global $wpdb;
+        $existe = true;
+        require RUTA."src/database/database.php";
+        $sql="SHOW TABLES;";
+        $resultados = $wpdb->get_results($sql, OBJECT);
+        $registros = array();
+        foreach($resultados as $resultado){
+            array_push($registros, $resultado->Tables_in_agencia);
+        }
+        $newTablas = array_keys($tablas);
+        // console_log($newTablas);
+        // console_log($registros);
+        foreach($newTablas as $tabla){
+            $existe = array_search($tabla, $registros);
+            if($existe == false){
+                // console_log($tabla);
+                $wpdb->query($tablas[$tabla], OBJECT);
+            }
+        }
+    }
+
+    function crear_menus(){
+        require RUTA."src/init/add-menu.php";
+        add_action( 'admin_menu', 'pdm_add_menu_page' );
+    }
  
 
 }
 if(class_exists('PasajerosDelMundo')){
     $pasajeroDelMundo = new PasajerosDelMundo();
 }
+
+//activación
+// register_activation_hook( __FILE__, array( $pasajeroDelMundo , 'activation' ) );

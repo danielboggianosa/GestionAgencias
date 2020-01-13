@@ -3,14 +3,15 @@ require($_SERVER['DOCUMENT_ROOT'] . '/wp-config.php');
 require($_SERVER['DOCUMENT_ROOT'] . '/wp-load.php');
 
 class Pasajero {
-    private $tabla = "pdm_pasajero";
+    private $tabla = "pdm_contacto";
 
     public function __construct() {}
     
     public function listar(){
         global $wpdb;
-        $sql = "SELECT ".$this->tabla."_id as id, ".$this->tabla."_nombres as nombres, ".$this->tabla."_apellidos as apellidos, ".$this->tabla."_foto as foto, ".$this->tabla."_fuente as fuente, pdm_telefono_numero as telefono, pdm_correo_correo as correo, pdm_identificacion_numero as documento FROM ".$this->tabla." LEFT JOIN pdm_paxtel ON pdm_paxtel_pasajero_ID = ".$this->tabla."_id LEFT JOIN pdm_telefono ON pdm_telefono_id = pdm_paxtel_telefono_ID LEFT JOIN pdm_paxcor ON pdm_paxcor_pasajero_ID = ".$this->tabla."_id LEFT JOIN pdm_correo ON pdm_correo_id = pdm_paxcor_correo_ID LEFT JOIN pdm_paxid ON pdm_paxid_pasajero_ID = ".$this->tabla."_id LEFT JOIN pdm_identificacion ON pdm_identificacion_id = pdm_paxid_identificacion_ID GROUP BY id LIMIT 1500;";
+        $sql = "SELECT ".$this->tabla."_id as id, ".$this->tabla."_nombres as nombres, ".$this->tabla."_apellidos as apellidos, ".$this->tabla."_foto as foto, ".$this->tabla."_fuente as fuente, ".$this->tabla."_estado as estado, pdm_telefono_numero as telefono, pdm_correo_correo as correo, pdm_identificacion_numero as documento FROM ".$this->tabla." LEFT JOIN pdm_telefono ON pdm_telefono_tabla = '".$this->tabla."' AND pdm_telefono_tabla_ID = ".$this->tabla."_id LEFT JOIN pdm_correo ON pdm_correo_tabla = '".$this->tabla."' AND pdm_correo_tabla_ID = ".$this->tabla."_id LEFT JOIN pdm_identificacion ON pdm_identificacion_tabla = '".$this->tabla."' AND pdm_identificacion_tabla_ID = ".$this->tabla."_id GROUP BY id LIMIT 1500;";
         $resultados = $wpdb->get_results($sql, OBJECT);
+        // console_log($sql);
         echo json_encode($resultados);
     }
 
@@ -19,16 +20,16 @@ class Pasajero {
         $sql = "SELECT ".$this->tabla."_id as id, ".$this->tabla."_nombres as nombres, ".$this->tabla."_apellidos as apellidos, ".$this->tabla."_nacimiento as nacimiento, ".$this->tabla."_nacionalidad as nacionalidad, ".$this->tabla."_foto as foto, ".$this->tabla."_notas as notas FROM ".$this->tabla." WHERE ".$this->tabla."_id = $id;";
         $pasajero = $wpdb->get_results($sql, OBJECT);
 
-        $sql="SELECT pdm_telefono_id as id, pdm_telefono_numero as telefono FROM pdm_telefono INNER JOIN pdm_paxtel ON pdm_paxtel_telefono_ID = pdm_telefono_id WHERE pdm_paxtel_pasajero_ID = $id;";
+        $sql="SELECT pdm_telefono_id as id, pdm_telefono_numero as telefono FROM pdm_telefono WHERE pdm_telefono_tabla = 'pdm_contacto' AND pdm_telefono_tabla_ID = $id;";
         $telefono = $wpdb->get_results($sql, OBJECT);
 
-        $sql = "SELECT pdm_correo_id as id, pdm_correo_correo as correo FROM pdm_correo INNER JOIN pdm_paxcor ON pdm_paxcor_correo_ID = pdm_correo_id WHERE pdm_paxcor_pasajero_ID = $id;";
+        $sql = "SELECT pdm_correo_id as id, pdm_correo_correo as correo FROM pdm_correo WHERE pdm_correo_tabla = 'pdm_contacto' AND pdm_correo_tabla_ID = $id;";
         $correo = $wpdb->get_results($sql, OBJECT);
 
-        $sql = "SELECT pdm_identificacion_id as id, pdm_identificacion_numero as numero, pdm_identificacion_tipo as tipo, pdm_identificacion_pais as pais, pdm_identificacion_emision as emision, pdm_identificacion_vencimiento as vencimiento, pdm_identificacion_nota as nota, pdm_identificacion_foto as foto FROM pdm_identificacion INNER JOIN pdm_paxid ON pdm_paxid_identificacion_ID = pdm_identificacion_id WHERE pdm_paxid_pasajero_ID = $id;";
+        $sql = "SELECT pdm_identificacion_id as id, pdm_identificacion_numero as numero, pdm_identificacion_tipo as tipo, pdm_identificacion_pais as pais, pdm_identificacion_emision as emision, pdm_identificacion_vencimiento as vencimiento, pdm_identificacion_nota as nota, pdm_identificacion_foto as foto FROM pdm_identificacion WHERE pdm_identificacion_tabla = 'pdm_contacto' AND pdm_identificacion_tabla_ID = $id;";
         $identificacion = $wpdb->get_results($sql, OBJECT);
 
-        $sql = "SELECT pdm_direccion_pais as pais, pdm_direccion_ciudad as ciudad, pdm_direccion_distrito as distrito, pdm_direccion_nombre as nombre, pdm_direccion_id as id FROM pdm_direccion INNER JOIN pdm_paxdir ON pdm_paxdir_direccion_ID = pdm_direccion_id WHERE pdm_paxdir_pasajero_ID = $id";
+        $sql = "SELECT pdm_direccion_pais as pais, pdm_direccion_ciudad as ciudad, pdm_direccion_distrito as distrito, pdm_direccion_nombre as nombre, pdm_direccion_id as id FROM pdm_direccion WHERE pdm_paxdir_direccion_ID = 'pdm_contacto' AND pdm_direccion_tabla_id = $id";
         $direccion = $wpdb->get_results($sql, OBJECT);
 
         $resultado = array(
@@ -62,41 +63,52 @@ class Pasajero {
     
     public function buscar($valor){
         global $wpdb;
-        $sql = "SELECT ".$this->tabla."_id as id, ".$this->tabla."_nombres as nombres, ".$this->tabla."_apellidos as apellidos, ".$this->tabla."_foto as foto, pdm_telefono_numero as telefono, pdm_correo_correo as correo, pdm_identificacion_numero as documento FROM ".$this->tabla." LEFT JOIN pdm_paxtel ON pdm_paxtel_pasajero_ID = ".$this->tabla."_id LEFT JOIN pdm_telefono ON pdm_telefono_id = pdm_paxtel_telefono_ID LEFT JOIN pdm_paxcor ON pdm_paxcor_pasajero_ID = ".$this->tabla."_id LEFT JOIN pdm_correo ON pdm_correo_id = pdm_paxcor_correo_ID LEFT JOIN pdm_paxid ON pdm_paxid_pasajero_ID = ".$this->tabla."_id LEFT JOIN pdm_identificacion ON pdm_identificacion_id = pdm_paxid_identificacion_ID WHERE ".$this->tabla."_nombres LIKE '%$valor%' OR ".$this->tabla."_apellidos LIKE '%$valor%' GROUP BY id LIMIT 50;";
+        $sql = "SELECT ".$this->tabla."_id as id, ".$this->tabla."_nombres as nombres, ".$this->tabla."_apellidos as apellidos, ".$this->tabla."_foto as foto, ".$this->tabla."_fuente as fuente, ".$this->tabla."_estado as estado, pdm_telefono_numero as telefono, pdm_correo_correo as correo, pdm_identificacion_numero as documento FROM ".$this->tabla." LEFT JOIN pdm_telefono ON pdm_telefono_tabla = '".$this->tabla."' AND pdm_telefono_tabla_ID = ".$this->tabla."_id LEFT JOIN pdm_correo ON pdm_correo_tabla = '".$this->tabla."' AND pdm_correo_tabla_ID = ".$this->tabla."_id LEFT JOIN pdm_identificacion ON pdm_identificacion_tabla = '".$this->tabla."' AND pdm_identificacion_tabla_ID = ".$this->tabla."_id WHERE ".$this->tabla."_nombres LIKE '%$valor%' OR ".$this->tabla."_apellidos LIKE '%$valor%' GROUP BY id LIMIT 50;";
         $resultado = $wpdb->get_results($sql, OBJECT);
         echo json_encode($resultado);
     }
-    public function insertar($data){
-        global $wpdb;        
-        $pasajero = array(
-            $this->tabla.'_nombres' => $data["nombres"],
-            $this->tabla.'_apellidos' => $data["apellidos"],
-            $this->tabla.'_nacionalidad' => $data["nacionalidad"],
-            $this->tabla.'_nacimiento' => $data["nacimiento"],
-            $this->tabla.'_notas' => $data["notas"],
-        );
-        $telefono = $data['telefono'];
-        $correo = $data['correo'];
-        $wpdb->insert($this->tabla, $pasajero);
+    public function insertar(){
+        global $wpdb; 
+        $wpdb->insert($this->tabla, $pasajero = array(
+            $this->tabla.'_nombres' => $_POST["nombre"],
+            $this->tabla.'_apellidos' => $_POST["apellido"],
+            $this->tabla.'_nacionalidad' => $_POST["nacionalidad"],
+            $this->tabla.'_nacimiento' => $_POST["nacimiento"],
+            $this->tabla.'_notas' => $_POST["observacion"],
+            $this->tabla.'_fuente' => $_POST["fuente"],
+            $this->tabla.'_estado' => "PROSPECTO",
+        ));
         $paxid = $wpdb->insert_id;
+        $wpdb->insert("pdm_registro", array(
+            "pdm_registro_contenido" => json_encode(array($this->tabla, $paxid, $pasajero)),
+            "pdm_registro_usuario" => get_current_user_id()
+        ));
+
+        $telefono = $_POST['telefono'];
+        $codigo = $_POST['codigo'];
         for($i=0;$i<sizeof($telefono);$i++){
-            $wpdb->insert("pdm_telefono", array(
-                "pdm_telefono_numero" => $telefono[$i]
+            $wpdb->insert($tab = "pdm_telefono", $data = array(
+                "pdm_telefono_numero" => $codigo[$i].$telefono[$i],
+                "pdm_telefono_tabla" => $this->tabla,
+                "pdm_telefono_tabla_ID" => $paxid
             ));
-            $telid = $wpdb->insert_id;
-            $wpdb->insert("pdm_paxtel", array(
-                "pdm_paxtel_pasajero_ID" => $paxid,
-                "pdm_paxtel_telefono_ID" => $telid
+            $tabid = $wpdb->insert_id;
+            $wpdb->insert("pdm_registro", array(
+                "pdm_registro_contenido" => json_encode(array($tab, $tabid, $data)),
+                "pdm_registro_usuario" => get_current_user_id()
             ));
         }
+        $correo = $_POST['correo'];
         for($i=0;$i<sizeof($correo);$i++){
-            $wpdb->insert("pdm_correo", array(
-                "pdm_correo_correo" => $correo[$i]
+            $wpdb->insert($tab = "pdm_correo", $datos = array(
+                "pdm_correo_correo" => $correo[$i],
+                "pdm_correo_tabla" => $this->tabla,
+                "pdm_correo_tabla_ID" => $paxid
             ));
-            $corid = $wpdb->insert_id;
-            $wpdb->insert("pdm_paxcor", array(
-                "pdm_paxcor_pasajero_ID" => $paxid,
-                "pdm_paxcor_correo_ID" => $corid
+            $tabid = $wpdb->insert_id;
+            $wpdb->insert("pdm_registro", array(
+                "pdm_registro_contenido" => json_encode(array($tab, $tabid, $data)),
+                "pdm_registro_usuario" => get_current_user_id()
             ));
         }
         if($_POST['identificacion'] != ""){
@@ -110,7 +122,9 @@ class Pasajero {
                 "tipo" => $_POST['TipoID']
             );
             for($i=0;$i<sizeof($identificacion['numero']);$i++){
-                $wpdb->insert("pdm_identificacion", array(
+                $wpdb->insert($tab = "pdm_identificacion", $datos = array(
+                    "pdm_identificacion_tabla" => $this->tabla,
+                    "pdm_identificacion_tabla_ID" => $paxid,
                     "pdm_identificacion_tipo" => $identificacion['tipo'][$i],
                     "pdm_identificacion_numero" => $identificacion['numero'][$i],
                     "pdm_identificacion_pais" => $identificacion['pais'][$i],
@@ -119,10 +133,10 @@ class Pasajero {
                     "pdm_identificacion_nota" => $identificacion['nota'][$i],
                     "pdm_identificacion_foto" => $identificacion['foto'][$i]
                 ));
-                $idid = $wpdb->insert_id;
-                $wpdb->insert("pdm_paxid", array(
-                    "pdm_paxid_pasajero_ID" => $paxid,
-                    "pdm_paxid_identificacion_ID" => $idid
+                $tabid = $wpdb->insert_id;
+                $wpdb->insert("pdm_registro", array(
+                    "pdm_registro_contenido" => json_encode(array($tab, $tabid, $data)),
+                    "pdm_registro_usuario" => get_current_user_id()
                 ));
             }    
         }
@@ -134,20 +148,33 @@ class Pasajero {
                 "pais" => $_POST['pais']
             );
             for($i=0;$i<sizeof($direccion['nombre']);$i++){
-                $wpdb->insert("pdm_direccion", array(
+                $wpdb->insert($tab = "pdm_direccion", $datos = array(
+                    "pdm_direccion_tabla" => $this->tabla,
+                    "pdm_direccion_tabla_ID" => $paxid,
                     "pdm_direccion_nombre" => $direccion['nombre'][$i],
                     "pdm_direccion_distrito" => $direccion['distrito'][$i],
                     "pdm_direccion_ciudad" => $direccion['ciudad'][$i],
                     "pdm_direccion_pais" => $direccion['pais'][$i],
                 ));
-                $dirid = $wpdb->insert_id;
-                $wpdb->insert("pdm_paxdir", array(
-                    "pdm_paxdir_pasajero_ID" => $paxid,
-                    "pdm_paxdir_direccion_ID" => $dirid,
+                $tabid = $wpdb->insert_id;
+                $wpdb->insert("pdm_registro", array(
+                    "pdm_registro_contenido" => json_encode(array($tab, $tabid, $data)),
+                    "pdm_registro_usuario" => get_current_user_id()
                 ));
             }
         }
-        echo json_encode($data);
+        $wpdb->insert($tab = "pdm_historial", $datos = array(
+            "pdm_historial_tabla" => $this->tabla,
+            "pdm_historial_tabla_id" => $paxid,
+            "pdm_historial_usuario" => get_current_user_id(),
+            "pdm_historial_contenido" => "Contacto creado",
+        ));
+        $tabid = $wpdb->insert_id;
+        $wpdb->insert("pdm_registro", array(
+            "pdm_registro_contenido" => json_encode(array($tab, $tabid, $data)),
+            "pdm_registro_usuario" => get_current_user_id()
+        ));
+        echo json_encode($paxid);
     }
 
     public function solicitudes($id){
@@ -164,8 +191,8 @@ if(isset($_POST['buscar'])){
     $pasajero->buscar($_POST['buscar']);
 }
 
-if(isset($_POST['obtener'])){
-    $pasajero->obtener($_POST['obtener']);
+if(isset($_GET['obtener'])){
+    $pasajero->obtener($_GET['obtener']);
 }
 
 if($_POST['listar']){
@@ -173,16 +200,7 @@ if($_POST['listar']){
 }
 
 if(isset($_POST['insertar'])){
-    $data = array(
-        "nombres" => $_POST['nombre'], 
-        "apellidos" => $_POST['apellido'],
-        "nacionalidad" => $_POST['nacionalidad'],
-        "nacimiento" => $_POST['nacimiento'],
-        "notas" => $_POST['observacion'],
-        "telefono" => $_POST['telefono'],
-        "correo" => $_POST['correo'],
-    );
-    $pasajero->insertar($data);
+    $pasajero->insertar();
 }
 
 if(isset($_POST['addPost'])){
