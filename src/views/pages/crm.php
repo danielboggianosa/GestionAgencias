@@ -179,19 +179,15 @@ function listar(r){
 function agregarPax(){
     // $("#form_pasajero").submit((e)=>e.preventDefault);
     var data = $("#form_pasajero").serialize();
+    
     if($("input[name='nombre']").val()){
         $.ajax({
             type:"POST",
             url: plugin_ruta+'src/controllers/pasajeroController.php',
             data: 'insertar=true&'+data,
         });
-        $.ajax({
-            url: plugin_ruta+'src/controllers/crmController.php',
-            type: 'POST',
-            data: 'listar=true',
-            success: (res)=>{listar(res)}
-        });
     }
+    $("input").val('');
 }
 
 </script>
