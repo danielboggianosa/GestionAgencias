@@ -109,24 +109,29 @@
         </button>
       </div>
       <div class="modal-body" id="historialBody">        
-        <form class="user">
+        <div class="user">
           <div class="form-group row">
             <div class="col-sm-6 mb-3 mb-sm-0">
-              <input type="text" class="form-control form-control-user" id="hsNombres" placeholder="First Name">
+              <label for="">Nombres:</label>
+              <input type="text" class="form-control form-control-user" id="hsNombres">
             </div>
             <div class="col-sm-6">
-              <input type="text" class="form-control form-control-user" id="hsApellidos" placeholder="Last Name">
+              <label for="">Apellidos:</label>
+              <input type="text" class="form-control form-control-user" id="hsApellidos">
             </div>
           </div>
           <div class="form-group">
-            <input type="text" class="form-control form-control-user" id="hsCorreo" placeholder="Email Address">
+            <label for="">Correo:</label>
+            <input type="text" class="form-control form-control-user" id="hsCorreo">
           </div>
           <div class="form-group row">
             <div class="col-sm-6 mb-3 mb-sm-0">
-              <input type="text" class="form-control form-control-user" id="hsTelefono" placeholder="Password">
+              <label for="">Telefono:</label>
+              <input type="text" class="form-control form-control-user" id="hsTelefono">
             </div>
             <div class="col-sm-6">
-              <input type="text" class="form-control form-control-user" id="hsFuente" placeholder="Repeat Password">
+              <label for="">Fuente:</label>
+              <input type="text" class="form-control form-control-user" id="hsFuente">
             </div>
           </div>
           <hr>
@@ -135,13 +140,14 @@
             <div class="card-body">
               <div class="row no-gutters align-items-center">
                 <div class="col mr-2">
-                  <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Hace 5 minutos por daniel</div>
-                  <div class="p mb-0 font-weight-bold text-gray-800">Contacto Creado</div>
+                  <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Agregar un comentario:</div>
+                  <div class="p mb-0 font-weight-bold text-gray-800"><textarea name="contenido" id="contenido" rows="3" class="form-control"></textarea><button class="btn btn-success float-right" type="button" id="agregarComentario">Agregar Comentario</button></div>
                 </div>                
               </div>
             </div>
           </div>
-        </form>                     
+          <div id="comentarios" class="row"></div>
+        </div>                     
       </div>
       <!-- <div class="modal-footer">
         <button class="btn btn-secondary" type="button" data-dismiss="modal" id="closeModal">Cancel</button>
@@ -196,6 +202,20 @@ $(document).ready(()=>{
   });
 
   $("#nuevoContactoBtn").click(()=>{$("#form_pasajero").load(plugin_ruta+'/src/views/forms/pasajero-nuevo.php')});  
+
+  $("#agregarComentario").click(()=>{
+    $.ajax({
+      url: plugin_ruta+'src/controllers/crmController.php',
+      type: 'POST',
+      data: 'contenido='+$("#contenido").val()+'&contactoId='+contactoId,
+      success: ()=>{
+        // console.log(res);
+        ahora = new Date();
+        $("#comentarios").prepend('<div class="col-12"><div class="card border-left-success shadow h-100 py-2"><div class="card-body"><div class="row no-gutters align-items-center"><div class="col mr-2"><div class="text-xs font-weight-bold text-success text-uppercase mb-1">'+$.timeago(ahora)+' por '+contactoUser+'</div><div class="p mb-0 font-weight-bold text-gray-800">'+$("#contenido").val()+'</div></div></div></div></div></div>');
+        $("textarea").val('');
+      }
+    })
+  })
 
 });
 
@@ -255,7 +275,7 @@ function paginar(pagina, items){
         var correo=(res[i].correo==null) ? "" : res[i].correo;
         var telefono=(res[i].telefono==null) ? "" : res[i].telefono;
         var fuente=(res[i].fuente==null) ? "" : res[i].fuente;
-        $("#contactos").append('<tr><td><button class="btn btn-success" id="Historial_'+i+'" title="Ver Historial" data-toggle="modal" data-target="#historialContacto"><i class="fa fa-plus"></i></button></td><td>'+res[i].nombres+'</td><td>'+res[i].apellidos+'</td><td>'+fuente+'</td><td>'+res[i].telefono+'</td><td>'+$.timeago(res[i].interaccion)+'</td><td>'+res[i].usuario+'</td><td>'+res[i].nota+'</td></tr>');
+        $("#contactos").append('<tr><td><button class="btn btn-success" onclick="verHistorial('+i+')" title="Ver Historial" data-toggle="modal" data-target="#historialContacto"><i class="fa fa-plus"></i></button></td><td>'+res[i].nombres+'</td><td>'+res[i].apellidos+'</td><td>'+fuente+'</td><td>'+res[i].telefono+'</td><td>'+$.timeago(res[i].interaccion)+'</td><td>'+res[i].usuario+'</td><td>'+res[i].nota+'</td></tr>');
     }
     
     $("#paginasBtns").html('');
@@ -281,6 +301,8 @@ function verHistorial(e){
     console.log(contactos[e]);
     c = contactos[e]
     contactoId = c.conId;
+    contactoUser = c.usuario;
+    $("input[type='text']").prop('disabled', true);
     $("#hsNombres").val(c.nombres);
     $("#hsApellidos").val(c.apellidos);
     $("#hsCorreo").val(c.correo);
@@ -291,7 +313,12 @@ function verHistorial(e){
       tyep: 'GET',
       data: 'historial='+contactoId,
       success: (res)=>{
-        console.log(res);
+        hs = eval(res);
+        console.log(hs);
+        $("#comentarios").html('');
+        hs.forEach(h=>{             
+          $("#comentarios").append('<div class="col-12"><div class="card border-left-success shadow h-100 py-2"><div class="card-body"><div class="row no-gutters align-items-center"><div class="col mr-2"><div class="text-xs font-weight-bold text-success text-uppercase mb-1">'+$.timeago(h.interaccion)+' por '+h.usuario+'</div><div class="p mb-0 font-weight-bold text-gray-800">'+h.contenido+'</div></div></div></div></div></div>');
+        });
       }
     })
 }

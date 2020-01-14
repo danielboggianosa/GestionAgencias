@@ -75,6 +75,29 @@ class Contacto {
         $resultado = $wpdb->get_results($sql, OBJECT);
         echo json_encode($resultado);
     }
+
+    public function historial($id){
+        global $wpdb;
+        $sql = "SELECT pdm_historial_id as id, pdm_historial_creado as interaccion, pdm_historial_contenido as contenido, user_login as usuario FROM pdm_historial INNER JOIN wp_users ON wp_users.ID = pdm_historial_usuario WHERE pdm_historial_tabla = '".$this->tabla."' AND pdm_historial_tabla_ID = $id ORDER BY interaccion DESC;";
+        $resultado = $wpdb->get_results($sql, OBJECT);
+        echo json_encode($resultado);
+    }
+
+    public function insertarHistorial(){
+        global $wpdb;
+        $wpdb->insert($tab = "pdm_historial", $datos = array(
+            "pdm_historial_tabla" => $this->tabla,
+            "pdm_historial_tabla_id" => $_POST['contactoId'],
+            "pdm_historial_usuario" => get_current_user_id(),
+            "pdm_historial_contenido" => $_POST['contenido']
+        ));
+        $tabid = $wpdb->insert_id;
+        $wpdb->insert("pdm_registro", array(
+            "pdm_registro_contenido" => json_encode(array($tab, $tabid, $data)),
+            "pdm_registro_usuario" => get_current_user_id()
+        ));
+
+    }
 }
 
 $contacto = new Contacto;
@@ -89,4 +112,12 @@ if(isset($_POST['obtener'])){
 
 if($_POST['listar']){
     $contacto->listar();
+}
+
+if(isset($_GET['historial'])){
+    $contacto->historial($_GET['historial']);
+}
+
+if(isset($_POST['contenido'])){
+    $contacto->insertarHistorial();
 }
