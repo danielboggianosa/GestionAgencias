@@ -1,26 +1,26 @@
 <div class="form-style-8 row" id="pasajero-nuevo">
-    <h3 class="col-md-12">Datos Principales</h3>
-    <div class="col-md-6 col-sm-12" id="nombre">
+    <h2 class="col-md-12">Datos Principales</h2>
+    <div class="col-md-12 col-lg-6" id="nombre">
         <label for="nombre">Nombres:</label>    
         <input name="nombre" type="text" placeholder="Escribe el nombre del cliente o solicitante" required>
     </div>
 
-    <div class="col-md-6 col-sm-12" id="apellidos">
+    <div class="col-md-12 col-lg-6" id="apellidos">
         <label for="apellido">Apellidos:</label>
         <input name="apellido" type="text" placeholder="Escribe el apellido del cliente o solicitante" required>
     </div>
 
-    <div class="col-md-6 col-sm-12" id="nacion">
+    <div class="col-md-12 col-lg-6" id="nacion">
         <label for="nacionalidad">Nacionalidad:</label>
         <select name="nacionalidad" id="nacionalidad"></select>
     </div>
 
-    <div class="col-md-6 col-sm-12" id="nacimiento">
+    <div class="col-md-12 col-lg-6" id="nacimiento">
         <label for="nacimiento">Fecha de nacimiento:</label>
         <input type="date" name="nacimiento">
     </div>
 
-    <div class="col-md-6 col-sm-12" id="fuente">
+    <div class="col-md-12 col-lg-6" id="fuente">
         <label for="fuente">Fuente de Marketing:</label>
         <input type="text" name="fuente">
     </div>

@@ -17,7 +17,38 @@ class Contacto {
         else{
             $filtro = "ORDER BY interaccion DESC";
         }
-        $sql = "SELECT ".$this->tabla."_id as conId, ".$this->tabla."_nombres as nombres, ".$this->tabla."_apellidos as apellidos, ".$this->tabla."_fuente as fuente, ".$this->tabla."_estado as estado, pdm_telefono_numero as telefono, pdm_correo_correo as correo, pdm_historial_contenido as nota, pdm_historial_creado as interaccion, user_login as usuario FROM ".$this->tabla." LEFT JOIN pdm_telefono ON pdm_telefono_tabla = '".$this->tabla."' AND pdm_telefono_tabla_ID = ".$this->tabla."_id LEFT JOIN pdm_correo ON pdm_correo_tabla = '".$this->tabla."' AND pdm_correo_tabla_ID = ".$this->tabla."_id INNER JOIN pdm_historial ON pdm_historial_tabla = '".$this->tabla."' AND pdm_historial_tabla_ID = ".$this->tabla."_id LEFT JOIN wp_users ON pdm_historial_usuario = ID GROUP BY conId $filtro LIMIT 5000;";
+        $sql = "SELECT  
+        a.pdm_contacto_id as conId, 
+        a.pdm_contacto_nombres as nombres, 
+        a.pdm_contacto_apellidos as apellidos,
+        a.pdm_contacto_fuente as fuente,
+        a.pdm_contacto_estado as estado,
+        d.pdm_telefono_numero as telefono, 
+        e.pdm_correo_correo as correo,
+        b.pdm_historial_contenido as nota,
+        b.pdm_historial_creado as interaccion,
+        f.user_login as usuario
+        FROM    pdm_contacto a
+        LEFT JOIN pdm_telefono d
+            ON d.pdm_telefono_tabla = 'pdm_contacto'
+            AND d.pdm_telefono_tabla_ID = a.pdm_contacto_id
+        LEFT JOIN pdm_correo e
+            ON e.pdm_correo_tabla = 'pdm_contacto'
+            AND e.pdm_correo_tabla_ID = a.pdm_contacto_id
+        INNER JOIN pdm_historial b
+            ON b.pdm_historial_tabla_ID = a.pdm_contacto_id
+        INNER JOIN
+        (
+            SELECT  pdm_historial_tabla_ID, MAX(pdm_historial_creado) Max_Date
+            FROM    pdm_historial
+            GROUP   BY pdm_historial_tabla_ID
+        ) c ON  b.pdm_historial_tabla_ID = c.pdm_historial_tabla_ID
+            AND b.pdm_historial_creado = Max_date           
+        INNER JOIN wp_users f
+            ON pdm_historial_usuario = f.ID
+        GROUP BY conId
+        $filtro
+        LIMIT 5000;";
         $resultados = $wpdb->get_results($sql, OBJECT);
         // echo $sql;
         echo json_encode($resultados);
