@@ -10,12 +10,12 @@
             <h3>Agregar Nueva Cotización</h3>
             <button class="btn btn-link" id="add_pasajero"><i class="fa fa-plus" id="add_pasajero_btn"></i> Nuevo Pasajero</button>
             <button class="btn btn-link" id="add_pax"><i class="fa fa-plus" id="add_pax_btn"></i> Pasajero Existente</button>
-            <button class="btn btn-link" id="add_det"><i class="fa fa-plus" id="add_det_btn"></i> Agregar Detalles</button>
-            <button class="btn btn-link" id="add_sol"><i class="fa fa-plus" id="add_sol_btn"></i> Cargar Solicitud</button>
+            <button class="btn btn-link" id="add_det" data-toggle="modal" data-target="#solicitudModal"><i class="fa fa-plus" id="add_det_btn"></i> Agregar Detalles</button>
+            <button class="btn btn-link" id="add_sol" data-toggle="modal" data-target="#solicitudModal"><i class="fa fa-plus" id="add_sol_btn"></i> Cargar Solicitud</button>
     
             <form id="form_pasajero"></form>
-            <form id="form_solicitud"></form>
-            <div id="dialogo"></div>
+
+            
             <div id="solicitud_buscar">
             <div class="card-header"><h4>Buscar Solicitud</h4></div>
                 <div class="card-body">
@@ -58,7 +58,7 @@
                     <p>Observaciones: <span id="det_obs"></span></p>
                 </div>
 
-                <button class="btn btn-link" id="add_ser"><i class="fa fa-plus" id="add_ser_btn"></i> Agregar Servicio</button>
+                <button class="btn btn-link" id="add_ser" data-toggle="modal" data-target="#servicioModal"><i class="fa fa-plus" id="add_ser_btn"></i> Agregar Servicio</button>
                 <div id="det_itinerario" class="form-style-8">
                     <h2>Itinerario</h2>
                     <table class="table table-hover">
@@ -95,6 +95,44 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="solicitudModal" tabindex="-1" role="dialog" aria-labelledby="solicitudModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="solicitudModalLabel">Detalles de la Solicitud</h5>
+          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">            
+            <form id="form_solicitud"></form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+          <button class="btn btn-primary" href="login.html">Agregar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+<div class="modal fade" id="servicioModal" tabindex="-1" role="dialog" aria-labelledby="servicioModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="servicioModalLabel">Detalles de la Servicio</h5>
+          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">            
+            <div id="dialogo"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+          <button class="btn btn-primary" href="login.html">Agregar</button>
+        </div>
+      </div>
+    </div>
+  </div>
 <script>
 var new_pax = false;
 var old_pax = false;
@@ -246,16 +284,16 @@ $("#add_sol").click(()=>{
     }
 });
 $("#add_ser").click(()=>{
-    $("#dialogo").dialog({
-        width:600,
-        height:500,
-        modal:true,
-        title: 'Nuevo Servicio',
-        buttons: {
-                    cancel: ()=>$("#dialogo").dialog('close'),
-                    'Agregar Servicio': agregarServicio,
-                },
-    })
+    // $("#dialogo").dialog({
+    //     width:600,
+    //     height:500,
+    //     modal:true,
+    //     title: 'Nuevo Servicio',
+    //     buttons: {
+    //                 cancel: ()=>$("#dialogo").dialog('close'),
+    //                 'Agregar Servicio': agregarServicio,
+    //             },
+    // });
     $("#dialogo").load(plugin_ruta+'src/views/forms/servicio.php');
 })
 

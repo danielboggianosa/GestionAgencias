@@ -1,7 +1,4 @@
     <div class="card">
-        <div class="card-header">
-            <h3>Detalles de la Solicitud</h3>
-        </div>
         <div class="card-body">
         <div class="form-group row">
             <label class="control-label col-sm-4" for="origen">Origen:</label>
