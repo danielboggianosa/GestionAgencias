@@ -17,7 +17,7 @@ class Pasajero {
 
     public function obtener($id){
         global $wpdb;
-        $sql = "SELECT ".$this->tabla."_id as id, ".$this->tabla."_nombres as nombres, ".$this->tabla."_apellidos as apellidos, ".$this->tabla."_nacimiento as nacimiento, ".$this->tabla."_nacionalidad as nacionalidad, ".$this->tabla."_foto as foto, ".$this->tabla."_notas as notas FROM ".$this->tabla." WHERE ".$this->tabla."_id = $id;";
+        $sql = "SELECT ".$this->tabla."_id as id, ".$this->tabla."_nombres as nombres, ".$this->tabla."_apellidos as apellidos, ".$this->tabla."_nacimiento as nacimiento, ".$this->tabla."_nacionalidad as nacionalidad, ".$this->tabla."_foto as foto, ".$this->tabla."_notas as notas, ".$this->tabla."_fuente as fuente FROM ".$this->tabla." WHERE ".$this->tabla."_id = $id;";
         $pasajero = $wpdb->get_results($sql, OBJECT);
 
         $sql="SELECT pdm_telefono_id as id, pdm_telefono_numero as telefono FROM pdm_telefono WHERE pdm_telefono_tabla = 'pdm_contacto' AND pdm_telefono_tabla_ID = $id;";
@@ -42,6 +42,38 @@ class Pasajero {
         echo json_encode($resultado);
     }
 
+    public function agregarTel(){
+        global $wpdb;
+        $telefono = $_POST['telefono'];
+        $paxid = $_POST['paxId'];
+        $wpdb->insert($tab = "pdm_telefono", $data = array(
+            "pdm_telefono_numero" => $telefono,
+            "pdm_telefono_tabla" => $this->tabla,
+            "pdm_telefono_tabla_ID" => $paxid
+        ));
+        $tabid = $wpdb->insert_id;
+        $wpdb->insert("pdm_registro", array(
+            "pdm_registro_contenido" => json_encode(array($tab, $tabid, $data)),
+            "pdm_registro_usuario" => get_current_user_id()
+        ));
+    }
+
+    public function agregarCor(){
+        global $wpdb;
+        $correo = $_POST['correo'];
+        $paxid = $_POST['paxId'];
+        $wpdb->insert($tab = "pdm_correo", $data = array(
+            "pdm_correo_correo" => $correo,
+            "pdm_correo_tabla" => $this->tabla,
+            "pdm_correo_tabla_ID" => $paxid
+        ));
+        $tabid = $wpdb->insert_id;
+        $wpdb->insert("pdm_registro", array(
+            "pdm_registro_contenido" => json_encode(array($tab, $tabid, $data)),
+            "pdm_registro_usuario" => get_current_user_id()
+        ));
+    }
+
     public function borrar($id){
         global $wpdb;
         $table = $this->tabla;
@@ -51,14 +83,90 @@ class Pasajero {
         echo json_encode($resultado);
     }
 
-    public function actualizar($id, $campo, $valor){
+    public function borrarTel(){
+        global $wpdb;
+        $id=$_POST['telId'];
+        $table = 'pdm_telefono';
+        $cid = $table."_id";
+        $sql = "DELETE FROM $table WHERE $cid = $id;";
+        $wpdb->query($sql);
+        $wpdb->insert("pdm_registro", array(
+            "pdm_registro_contenido" => json_encode(array($table, $id, 'eliminado')),
+            "pdm_registro_usuario" => get_current_user_id()
+        ));
+    }
+
+    public function borrarCor(){
+        global $wpdb;
+        $id=$_POST['corId'];
+        $table = 'pdm_correo';
+        $cid = $table."_id";
+        $sql = "DELETE FROM $table WHERE $cid = $id;";
+        $wpdb->query($sql);
+        $wpdb->insert("pdm_registro", array(
+            "pdm_registro_contenido" => json_encode(array($table, $id, 'eliminado')),
+            "pdm_registro_usuario" => get_current_user_id()
+        ));
+    }
+
+    public function actualizar(){
+        // $campo = $table."_".$campo;
+        // $sql = "UPDATE $table SET $campo = '$valor' WHERE $cid = $id;";
+        // $resultado = $wpdb->query($sql);
         global $wpdb;
         $table = $this->tabla;
         $cid = $table."_id";
-        $campo = $table."_".$campo;
-        $sql = "UPDATE $campo = $valor FROM $table WHERE ";
-        $resultado = $wpdb->get_results($sql, OBJECT);
-        echo json_encode($resultado);
+        $id = $_POST['paxId'];
+        $wpdb->update(
+            $table,
+            $data = array(
+                $table.'_nombres' => $_POST["nombre"],
+                $table.'_apellidos' => $_POST["apellido"],
+                $table.'_nacionalidad' => $_POST["nacionalidad"],
+                $table.'_nacimiento' => $_POST["nacimiento"],
+                $table.'_notas' => $_POST["observacion"],
+                $table.'_fuente' => $_POST["fuente"]
+            ),
+            array($cid => $id)
+        );
+        console_log($sql);
+        $tabid = $id;
+        $wpdb->insert("pdm_registro", array(
+            "pdm_registro_contenido" => json_encode(array($table, $tabid, $data, 'actualizado')),
+            "pdm_registro_usuario" => get_current_user_id()
+        ));
+    }
+
+    public function actualizarTel(){
+        global $wpdb;
+        $table = "pdm_telefono";
+        $cid = $table."_id";
+        $campo = $table."_numero";
+        $id = $_POST['telId'];
+        $valor = $_POST['telefono'];
+        $sql = "UPDATE $table SET $campo = '$valor' WHERE $cid = $id;";
+        $wpdb->query($sql);
+        $tabid = $id;
+        $wpdb->insert("pdm_registro", array(
+            "pdm_registro_contenido" => json_encode(array($table, $tabid, array($campo => $valor), 'actualizado')),
+            "pdm_registro_usuario" => get_current_user_id()
+        ));
+    }
+
+    public function actualizarCor(){
+        global $wpdb;
+        $table = "pdm_correo";
+        $cid = $table."_id";
+        $campo = $table."_correo";
+        $id = $_POST['corId'];
+        $valor = $_POST['correo'];
+        $sql = "UPDATE $table SET $campo = '$valor' WHERE $cid = $id;";
+        $wpdb->query($sql);
+        $tabid = $id;
+        $wpdb->insert("pdm_registro", array(
+            "pdm_registro_contenido" => json_encode(array($table, $tabid, array($campo => $valor), 'actualizado')),
+            "pdm_registro_usuario" => get_current_user_id()
+        ));
     }
     
     public function buscar($valor){
@@ -80,7 +188,7 @@ class Pasajero {
         ));
         $paxid = $wpdb->insert_id;
         $wpdb->insert("pdm_registro", array(
-            "pdm_registro_contenido" => json_encode(array($this->tabla, $paxid, $pasajero)),
+            "pdm_registro_contenido" => json_encode(array($this->tabla, $paxid, $pasajero, 'insertado')),
             "pdm_registro_usuario" => get_current_user_id()
         ));
 
@@ -94,7 +202,7 @@ class Pasajero {
             ));
             $tabid = $wpdb->insert_id;
             $wpdb->insert("pdm_registro", array(
-                "pdm_registro_contenido" => json_encode(array($tab, $tabid, $data)),
+                "pdm_registro_contenido" => json_encode(array($tab, $tabid, $data, 'insertado')),
                 "pdm_registro_usuario" => get_current_user_id()
             ));
         }
@@ -107,7 +215,7 @@ class Pasajero {
             ));
             $tabid = $wpdb->insert_id;
             $wpdb->insert("pdm_registro", array(
-                "pdm_registro_contenido" => json_encode(array($tab, $tabid, $data)),
+                "pdm_registro_contenido" => json_encode(array($tab, $tabid, $data, 'insertado')),
                 "pdm_registro_usuario" => get_current_user_id()
             ));
         }
@@ -135,7 +243,7 @@ class Pasajero {
                 ));
                 $tabid = $wpdb->insert_id;
                 $wpdb->insert("pdm_registro", array(
-                    "pdm_registro_contenido" => json_encode(array($tab, $tabid, $data)),
+                    "pdm_registro_contenido" => json_encode(array($tab, $tabid, $data, 'insertado')),
                     "pdm_registro_usuario" => get_current_user_id()
                 ));
             }    
@@ -158,7 +266,7 @@ class Pasajero {
                 ));
                 $tabid = $wpdb->insert_id;
                 $wpdb->insert("pdm_registro", array(
-                    "pdm_registro_contenido" => json_encode(array($tab, $tabid, $data)),
+                    "pdm_registro_contenido" => json_encode(array($tab, $tabid, $data, 'insertado')),
                     "pdm_registro_usuario" => get_current_user_id()
                 ));
             }
@@ -201,6 +309,40 @@ if($_POST['listar']){
 
 if(isset($_POST['insertar'])){
     $pasajero->insertar();
+}
+
+if(isset($_POST['actualizar'])){
+    $pasajero->actualizar();
+}
+
+if(isset($_POST['actualizarFoto'])){
+    $id = $_POST['paxId'];
+    $pasajero->AgregarFoto($id);
+    // console_log($_FILES[]);
+}
+
+if(isset($_POST['actualizarTel'])){
+    $pasajero->actualizarTel();
+}
+
+if(isset($_POST['actualizarCor'])){
+    $pasajero->actualizarCor();
+}
+
+if(isset($_POST['agregarTel'])){
+    $pasajero->agregarTel();
+}
+
+if(isset($_POST['agregarCor'])){
+    $pasajero->agregarCor();
+}
+
+if(isset($_POST['borrarTel'])){
+    $pasajero->borrarTel();
+}
+
+if(isset($_POST['borrarCor'])){
+    $pasajero->borrarCor();
 }
 
 if(isset($_POST['addPost'])){

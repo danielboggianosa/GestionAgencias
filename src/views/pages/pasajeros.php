@@ -5,9 +5,16 @@
         <div class="buttons">
             <button class="btn btn-link" id="agregar_pax"><i class="fa fa-plus"></i> Nuevo Pasajero</button>
             <button class="btn btn-link" id="historial_pax"><i class="fa fa-plus"></i> Ver Historial</button>
+            <button class="btn btn-link" id="cargar_contactos" onclick="listarPax()"><i class="fa fa-eye"></i> Cargar Contactos</button>
         </div>
         <div id="form_pasajero_dialog">
             <form id="form_pasajero"></form>
+        </div>
+        <div id="editar_pasajero_dialog">
+            <form id="editar_pasajero"></form>
+        </div>
+        <div id="editar_foto_dialog">
+            <form id="editar_fotos" enctype="multipart/form-data"></form>
         </div>
 
         <div class="row">
@@ -18,16 +25,7 @@
                 <div>
                     <div class="white z-depth-1 px-3 pt-3 pb-0 overflow-auto h-auto" style="padding:1%;max-height:500px">
                         <ul class="list-unstyled friend-list" id="pax_datos">
-                        <li class="active grey lighten-3 p-2 d-flex justify-content-between">
-                            <img src="../wp-content/plugins/pdm-admin/src/imagenes/dummy-pax.jpg" height="50" alt="avatar" class="avatar rounded-circle d-flex align-self-center mr-2 z-depth-1">
-                            <div class="text-small text-left">
-                                <strong>John Doe</strong>
-                                <p class="last-message text-muted"><i class="fa fa-phone"></i> telefono <i class="fa fa-envelope"></i> correo</p>
-                            </div>
-                            <div class="">
-                                <i class="fa fa-angle-right align-middle"></i>
-                            </div>      
-                        </li>          
+                        <h4>Haz click en <strong>Cargar Contactos</strong></h4>
                         </ul>
                     </div>                
                 </div>
@@ -35,40 +33,42 @@
             <div class="col-md-8" id="pax_detalles">
                 <div class="form-style-8">
                     <h2 class="">Detalles del Pasajero
-                        <button class="btn btn-info float-right">
-                        <i class="fa fa-edit"></i> Editar</button>
+                    <button class="btn btn-info float-right" onclick="actualizarPax()">
+                        <i class="fa fa-edit"></i> Actualizar</button>
                     </h2>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <img src="../wp-content/plugins/pdm-admin/src/imagenes/dummy-pax.jpg" alt="avatar" class="avatar rounded-circle d-flex mr-2 z-depth-1 h-auto w-auto mx-auto" style="max-height:100px;max-width:100px">
+                    <form id="detallesCargados">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <img src="../wp-content/plugins/pdm-admin/src/imagenes/dummy-pax.jpg" alt="avatar" class="avatar rounded-circle d-flex mr-2 z-depth-1 h-auto w-auto mx-auto" style="max-height:100px;max-width:100px" id="pax_foto"  onclick="editarFoto()">
+                            </div>
+                            <div class="col-md-4">
+                                <label>Nombres:</label>
+                                <input type="text" id="pax_name" name="nombre">
+                            </div>
+                            <div class="col-md-4">
+                                <label>Apellidos:</label>
+                                <input type="text" class="" id="pax_apellidos" name="apellido">
+                            </div>
                         </div>
-                        <div class="col-md-4">
-                            <label>Nombres:</label>
-                            <input type="text" id="pax_name">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label>Nacimiento:</label>
+                                <input type="date" id="pax_nacimiento" name="nacimiento">
+                            </div>
+                            <div class="col-md-4">
+                                <label>Nacionalidad:</label>
+                                <input type="text" id="pax_nacionalidad" name="nacionalidad">
+                            </div>
+                            <div class="col-md-4">
+                                <label>Notas:</label>
+                                <input type="text" id="pax_notas" name="observacion">
+                            </div>
+                            <div class="col-md-6">
+                            <label>Fuente de Marketing</label>
+                            <input type="text" id="pax_fuente" name="fuente">
                         </div>
-                        <div class="col-md-4">
-                            <label>Apellidos:</label>
-                            <input type="text" class="" id="pax_apellidos">
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <label>Nacimiento:</label>
-                            <input type="date" id="pax_nacimiento">
-                        </div>
-                        <div class="col-md-4">
-                            <label>Nacionalidad:</label>
-                            <input type="text" id="pax_nacionalidad">
-                        </div>
-                        <div class="col-md-4">
-                            <label>Notas:</label>
-                            <input type="text" id="pax_notas">
-                        </div>
-                        <div class="col-md-6">
-                        <label>Fuente de Marketing</label>
-                        <input type="text" id="pax_fuente">
-                    </div>
-                    </div>
+                    </form>
                     <div class="row" id="pax_documentos"></div>
                     <h3>Datos de contacto</h3>
                     <div class="row" id="pax_telefonos"></div>
@@ -121,6 +121,13 @@
 var pasajeros=[];
 var pax,tel,cor,dir,doc;
 $(document).ready(()=>{
+    
+    $("#submitFoto").click(e=>{
+        e.preventDefault;
+        var data = $("#editar_foto").serialize();
+        console.log(data);    
+    });
+
     $("#pax_detalles").hide();
     $("#pax_historial").hide();
     $("#historial_pax").hide();
@@ -134,19 +141,31 @@ $(document).ready(()=>{
             cancel: ()=>{$("#form_pasajero_dialog").dialog( "close" );}
         }
     });
-    $.ajax({
-        url: plugin_ruta+'src/controllers/pasajeroController.php',
-        type: 'POST',
-        data: 'listar=true&estado="PASAJERO"',
-        success: (res)=>{listarPax(res)}
+    $("#editar_pasajero_dialog").dialog({
+        autoOpen:false,
+        width:600,
+        height:500,
+        modal:true,
+        title:"Actualizar Pasajero",
+        buttons: {"Actualizar Datos": actualizarPax,
+            cancel: ()=>{$("#editar_pasajero_dialog").dialog( "close" );}
+        }
     });
-
+    $("#editar_foto_dialog").dialog({
+        autoOpen:false,
+        modal:true,
+        title:"Actualizar Foto",
+        buttons: {"Actualizar Foto": actualizarFoto,
+            cancel: ()=>{$("#editar_foto_dialog").dialog( "close" );}
+        }
+    });
+    listarPax();
     $("#buscar_pax").keyup(()=>{
         $.ajax({
             url: plugin_ruta+'src/controllers/pasajeroController.php',
             type:"POST",
             data:'buscar='+$("#buscar_pax").val(),
-            success: (res)=>{listarPax(res)}
+            success: (res)=>{listarBuscar(res)}
         });               
     });
 
@@ -162,7 +181,27 @@ $(document).ready(()=>{
     })
 })
 
-function listarPax(r){
+function listarPax(){
+    $.ajax({
+        url: plugin_ruta+'src/controllers/pasajeroController.php',
+        type: 'POST',
+        data: 'listar=true&estado="PASAJERO"',
+        success: (r)=>{
+            var res = eval(r);
+            pasajeros = res;
+            $("#pax_datos").html("");
+            for(i=0;i<res.length;i++){
+                var foto=(res[i].foto==null || res[i].foto==undefined) ? plugin_ruta+"src/imagenes/dummy-pax.jpg" : res[i].foto;
+                var documento=(res[i].documento==null) ? "" : res[i].documento;
+                var correo=(res[i].correo==null) ? "" : res[i].correo;
+                var telefono=(res[i].telefono==null) ? "" : res[i].telefono;
+                $("#pax_datos").append('<li onclick="seleccionarPax('+res[i].id+')" class="active grey lighten-3 p-2 d-flex" style="cursor:pointer"><img src="'+foto+'" width:"50" height="50" alt="avatar" class="avatar rounded-circle d-flex align-self-center mr-2 z-depth-1"><div class="text-small text-left" style="width:70%"><strong>'+res[i].nombres+' '+res[i].apellidos+'</strong><p class="last-message text-muted"><i class="fa fa-phone"></i> '+telefono+' <i class="fa fa-envelope"></i> '+correo+'</p></div><div style="width:10%"><button class="btn btn-link"><i class="fa fa-angle-right align-middle"></i></button></div></li>');
+            }
+        }
+    });
+}
+
+function listarBuscar(r){
     var res = eval(r);
     pasajeros = res;
     $("#pax_datos").html("");
@@ -187,28 +226,29 @@ function seleccionarPax(id){
             doc = eval(res)[3];
             dir = eval(res)[4];
             if(pax.foto == null || pax.foto == undefined)
-                pax.foto = plugin_ruta+"src/imagenes/dummy-pax.jpg";
+                pax.foto = plugin_ruta+"src/imagenes/logo.png";
             console.log(pax);
             $("#pax_detalles").show();
+            $("#pax_foto").attr('src', pax.foto);
             $("#pax_name").val(pax.nombres);
             $("#pax_apellidos").val(pax.apellidos);
             $("#pax_nacimiento").val(pax.nacimiento);
             $("#pax_nacionalidad").val(pax.nacionalidad);
             $("#pax_notas").val(pax.notas);
             $("#pax_fuente").val(pax.fuente);
-            $("#pax_telefonos").html('<div class="col-12"><h4>Teléfonos:</h4></div>');
+            $("#pax_telefonos").html('<div class="col-12"><h4>Teléfonos:<button class="float-right" onclick="nuevoTel()">Nuevo Teléfono</button></h4></div>');
             for(i=0;i<tel.length;i++){
-                $("#pax_telefonos").append('<div class="col-4"><button class="btn btn-lnk" id="'+tel[i].id+'"><i class="fa fa-phone"></i> '+tel[i].telefono+'</button></div>')
+                $("#pax_telefonos").append('<div class="col-4" id="telefono_'+tel[i].id+'"><button class="btn btn-lnk" id="'+tel[i].id+'" ondblclick="editarTel('+tel[i].id+')" href="tel:'+tel[i].telefono+'"><i class="fa fa-phone"></i> '+tel[i].telefono+'</button><button class="btn btn-danger" onclick="borrarTel('+tel[i].id+')"><i class="fa fa-trash"></i></button></div>')
             }
-            $("#pax_correos").html('<div class="col-12"><h4>Correos:</h4></div>');
+            $("#pax_correos").html('<div class="col-12"><h4>Correos:<button class="float-right" onclick="nuevoCor()">Nuevo Correo</button></h4></div>');
             for(i=0;i<cor.length;i++){
-                $("#pax_correos").append('<div class="col-6"><button class="btn btn-lnk" id="'+cor[i].id+'"><i class="fa fa-envelope"></i> '+cor[i].correo+'</button></div>')
+                $("#pax_correos").append('<div class="col-6" id="correo_'+cor[i].id+'"><button class="btn btn-lnk" id="'+cor[i].id+'" ondblclick="editarCor('+cor[i].id+')"><i class="fa fa-envelope"></i> '+cor[i].correo+'</button><button class="btn btn-danger" onclick="borrarCor('+cor[i].id+')"><i class="fa fa-trash"></i></button></div>')
             }
             $("#pax_direcciones").html('<div class="col-12"><h4>Direcciones:</h4></div>');
             for(i=0;i<dir.length;i++){
                 $("#pax_direcciones").append('<div class="col-6"><strong><i class="fa fa-home"></i> Dirección '+eval(i+1)+'</strong><input type="text" id="'+dir[i].nombre+'_'+dir[i].id+'" value="'+dir[i].nombre+'"><input type="text" id="'+dir[i].distrito+'_'+dir[i].id+'" value="'+dir[i].distrito+'"><input type="text" id="'+dir[i].ciudad+'_'+dir[i].id+'" value="'+dir[i].ciudad+'"><input type="text" id="'+dir[i].pais+'_'+dir[i].id+'" value="'+dir[i].pais+'"></div>')
             }
-            $("input").prop("disabled", true);
+            // $("input").prop("disabled", true);
             $("#buscar_pax").prop("disabled", false);
             $("#historial_pax").show();
         }
@@ -280,6 +320,171 @@ function verHistorial(){
         });
     }
 }
+function editarPasajero(){
+    $("#editar_pasajero_dialog").dialog('open');
+    $("#editar_pasajero").load(plugin_ruta+'src/views/forms/pasajero-nuevo.php',()=>{
+        $("input[name='nombre']").val(pax.nombres);
+        $("input[name='apellido']").val(pax.apellidos);
+        $("input[name='nacimiento']").val(pax.nacimiento);
+        $("input[name='nacionalidad']").val(pax.nacionalidad);
+        $("input[name='fuente']").val(pax.fuente);
+        $("#DetallesAdd").click();
+        $("#DetallesAdd").remove();
+        $("#telefono").remove();
+        $("#correo").remove();
+        $("#direccion").remove();
+        $("#identificacion").remove();
+        $("textarea[name='observacion']").val(pax.notas);
+        console.log($("textarea[name='observacion']").val());
+    });
+}
+function editarFoto(){
+    $("#editar_foto_dialog").dialog('open');
+    $("#editar_foto").html('<input type="file" name="fileToUpload" id="fileToUpload"><input type="hidden" value="Upload Image" name="submit">')
+}
+
+function actualizarPax(){
+    var data = $("#detallesCargados").serialize();
+    // var foto = $('#foto')[0].files[0];
+    // data.append('file',foto);
+    console.log(data);
+    if($("input[name='nombre']").val() && $("input[name='apellido']").val()){
+        $.ajax({
+            type:"POST",
+            url: plugin_ruta+'src/controllers/pasajeroController.php',
+            data: 'actualizar=true&paxId='+pax.id+'&'+data,
+            success: (res)=>{
+                listarPax();
+                seleccionarPax(pax.id);
+                // $("#editar_pasajero_dialog").dialog( "close" );
+            }
+        });
+    }
+}
+
+function actualizarFoto(){
+    var data = $("#editar_foto").serialize();
+    console.log(data);
+    if(foto.size>0){
+        $.ajax({
+            type:"POST",
+            url: plugin_ruta+'src/views/pages/upload.php',
+            data: data,
+            success: (res)=>{
+                listarPax();
+                seleccionarPax(pax.id);
+                $("#editar_foto_dialog").dialog( "close" );
+            }
+        });
+    }
+}
+
+function editarTel(id){
+    var telefono = tel.filter(t=>t.id == id);
+    $("#telefono_"+id).html('<input type="text" name="telefono" value="'+telefono[0].telefono+'" id="telefono"><input type="button" onclick="actualizarTel('+id+',telefono.value)" value="Actualizar">');
+}
+
+function actualizarTel(id, telefono){
+    // console.log(id,telefono);
+    if(telefono){
+        $.ajax({
+            type:"POST",
+            url: plugin_ruta+'src/controllers/pasajeroController.php',
+            data: 'actualizarTel=true&telId='+id+'&telefono='+telefono,
+            success: (res)=>{
+                listarPax();
+                seleccionarPax(pax.id);
+            }
+        });
+    }
+}
+
+function editarCor(id){
+    var correo = cor.filter(c=>c.id == id);
+    $("#correo_"+id).html('<input type="text" name="correo" value="'+correo[0].correo+'" id="correo"><input type="button" onclick="actualizarCor('+id+',correo.value)" value="Actualizar">');
+}
+
+function actualizarCor(id, correo){
+    // console.log(id,correo);
+    if(correo){
+        $.ajax({
+            type:"POST",
+            url: plugin_ruta+'src/controllers/pasajeroController.php',
+            data: 'actualizarCor=true&corId='+id+'&correo='+correo,
+            success: (res)=>{
+                listarPax();
+                seleccionarPax(pax.id);
+            }
+        });
+    }
+}
+
+function nuevoTel(){
+    $("#pax_telefonos").append('<div class="col-4" id="nuevoTelefono"><input type="text" name="telefono" value="" id="telefono"><input type="button" onclick="agregarTel(telefono.value)" value="Agregar"></div>');
+    $("#telefono").focus();
+}
+
+function agregarTel(telefono){
+    if(telefono){
+        $.ajax({
+            type:"POST",
+            url: plugin_ruta+'src/controllers/pasajeroController.php',
+            data: 'agregarTel=true&paxId='+pax.id+'&telefono='+telefono,
+            success: (res)=>{
+                listarPax();
+                seleccionarPax(pax.id);
+            }
+        });
+    }
+}
+
+function nuevoCor(){
+    $("#pax_correos").append('<div class="col-4" id="nuevoCorreo"><input type="text" name="correo" value="" id="correo"><input type="button" onclick="agregarCor(correo.value)" value="Agregar"></div>');
+    $("#correo").focus();
+}
+
+function agregarCor(correo){
+    if(correo){
+        $.ajax({
+            type:"POST",
+            url: plugin_ruta+'src/controllers/pasajeroController.php',
+            data: 'agregarCor=true&paxId='+pax.id+'&correo='+correo,
+            success: (res)=>{
+                listarPax();
+                seleccionarPax(pax.id);
+            }
+        });
+    }
+}
+
+function borrarTel(id){
+    if(confirm("¿Realmente deseas borrar este teléfono?")){
+        $.ajax({
+            type:"POST",
+            url: plugin_ruta+'src/controllers/pasajeroController.php',
+            data: 'borrarTel=true&telId='+id,
+            success: (res)=>{
+                listarPax();
+                seleccionarPax(pax.id);
+            }
+        });
+    }
+}
+
+function borrarCor(id){
+    if(confirm("¿Realmente deseas borrar este correo?")){
+        $.ajax({
+            type:"POST",
+            url: plugin_ruta+'src/controllers/pasajeroController.php',
+            data: 'borrarCor=true&corId='+id,
+            success: (res)=>{
+                listarPax();
+                seleccionarPax(pax.id);
+            }
+        });
+    }
+}
+
 </script>
 <style>
 </style>
