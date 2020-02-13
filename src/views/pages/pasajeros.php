@@ -1,15 +1,36 @@
 <?php include RUTA."/src/views/common/head.php" ?>
 
+<!-- MODAL DE FORMULARIO DE PASAJERO -->
+<div class="modal fade" id="form_pasajero_dialog" tabindex="-1" role="dialog" aria-labelledby="areaModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="areaModalLabel"></h5>
+            <button class="close" type="button" data-dismiss="modal" aria-label="Close" id="agregar_pax_close">
+            <span aria-hidden="true">×</span>
+            </button>
+        </div>
+        <div class="modal-body">
+
+            <form id="form_pasajero"></form>
+
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
+            <button class="btn btn-primary" onclick="agregarPax()">Agregar</button>
+        </div>
+        </div>
+    </div>
+</div>
+
 <div class="wrap">
     <div class="container-fluid">
         <div class="buttons">
-            <button class="btn btn-link" id="agregar_pax"><i class="fa fa-plus"></i> Nuevo Pasajero</button>
+            <button class="btn btn-link" id="ver_buscar"><i class="fa fa-angle-left"></i> Buscar</button>
+            <button class="btn btn-link" id="agregar_pax" data-toggle="modal" data-target="#form_pasajero_dialog"><i class="fa fa-plus"></i> Nuevo Pasajero</button>
             <button class="btn btn-link" id="historial_pax"><i class="fa fa-plus"></i> Ver Historial</button>
-            <button class="btn btn-link" id="cargar_contactos" onclick="listarPax()"><i class="fa fa-eye"></i> Cargar Contactos</button>
         </div>
-        <div id="form_pasajero_dialog">
-            <form id="form_pasajero"></form>
-        </div>
+        
         <div id="editar_pasajero_dialog">
             <form id="editar_pasajero"></form>
         </div>
@@ -18,9 +39,9 @@
         </div>
 
         <div class="row">
-            <div class="col-md-4" id="pax_lista" style="max-height:550px">
+            <div class="col-md-12" id="pax_lista" style="max-height:550px">
                 <div class="md-form mt-0" id="pax_search">
-                    <input class="form-control" type="text" id="buscar_pax" placeholder="Filtrar por Nombre o Apellido del pasajero" aria-label="Filtrar por Nombre o Apellido del pasajero">
+                    <input class="form-control" name="buscar_pax" type="text" id="buscar_pax" onKeyup="filtrarPax(this.value)" placeholder="Filtrar por Nombre o Apellido del pasajero" aria-label="Filtrar por Nombre o Apellido del pasajero">
                 </div>
                 <div>
                     <div class="white z-depth-1 px-3 pt-3 pb-0 overflow-auto h-auto" style="padding:1%;max-height:500px">
@@ -30,46 +51,44 @@
                     </div>                
                 </div>
             </div>
-            <div class="col-md-8" id="pax_detalles">
+        </div>
+        <div class="row">
+            <div class="col-md-12" id="pax_detalles">
                 <div class="form-style-8">
                     <h2 class="">Detalles del Pasajero
                     <button class="btn btn-info float-right" onclick="actualizarPax()">
                         <i class="fa fa-edit"></i> Actualizar</button>
                     </h2>
-                    <!-- <form action="../wp-content/plugins/pdm-admin/src/views/upload.php">
-                        <input type="file" name="fileToUpload">
-                        <input type="submit" value="submit">
-                    </form> -->
                     <form id="detallesCargados" enctype="multipart/form-data">
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-4 col-xs-12">
                             <label for="foto">
-                                <img src="../wp-content/plugins/pdm-admin/src/imagenes/dummy-pax.jpg" alt="avatar" class="avatar rounded-circle d-flex mr-2 z-depth-1 h-auto w-auto mx-auto" style="max-height:200px;max-width:200px" id="pax_foto">
+                                <img src="../wp-content/plugins/pdm-admin/src/imagenes/dummy-pax.jpg" alt="avatar" class="avatar rounded-circle d-flex mr-2 z-depth-1 h-auto w-auto mx-auto" style="max-height:100%;max-width:100%" id="pax_foto">
                             </label>
                             <input class="d-none" type="file" name="foto" id="foto">
                             </div>
                             <div class="col-8 row">
-                                <div class="col-md-6">
+                                <div class="col-md-6 col-xs-12">
                                     <label>Nombres:</label>
                                     <input type="text" id="pax_name" name="nombre">
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-6 col-xs-12">
                                     <label>Apellidos:</label>
                                     <input type="text" class="" id="pax_apellidos" name="apellido">
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-6 col-xs-12">
                                     <label>Nacimiento:</label>
                                     <input type="date" id="pax_nacimiento" name="nacimiento">
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-6 col-xs-12">
                                     <label>Nacionalidad:</label>
                                     <input type="text" id="pax_nacionalidad" name="nacionalidad">
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-6 col-xs-12">
                                     <label>Notas:</label>
                                     <input type="text" id="pax_notas" name="observacion">
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-6 col-xs-12">
                                 <label>Fuente de Marketing</label>
                                 <input type="text" id="pax_fuente" name="fuente">
                                 </div>
@@ -87,7 +106,7 @@
                 <h2 class="">Historial del Pasajero</h2>
                 <div class="row">
                     <div class="col-4">
-                        <img src="../wp-content/plugins/pdm-admin/src/imagenes/dummy-pax.jpg" alt="avatar" class="avatar rounded-circle d-flex align-self-center mr-2 z-depth-1 h-auto w-auto" style="max-height:100px;max-width:100px">
+                        <img src="../wp-content/plugins/pdm-admin/src/imagenes/dummy-pax.jpg" alt="avatar" class="avatar rounded-circle d-flex mr-2 z-depth-1 h-auto w-auto mx-auto" style="max-height:100%;max-width:100%" id="pax_foto">
                     </div>
                     <div class="col-4">
                         <label>Nombres:</label>
@@ -99,19 +118,19 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-4 col-xs-12">
                         <label>Nacimiento:</label>
                         <input type="date" id="sol_nacimiento">
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-4 col-xs-12">
                         <label>Nacionalidad:</label>
                         <input type="text" id="sol_nacionalidad">
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-4 col-xs-12">
                         <label>Notas:</label>
                         <input type="text" id="sol_notas">
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 col-xs-12">
                         <label>Fuente de Marketing</label>
                         <input type="text" id="sol_fuente">
                     </div>
@@ -128,52 +147,52 @@
 var pasajeros=[];
 var pax,tel,cor,dir,doc;
 $(document).ready(()=>{
-    
+    listarPax();
     $("#foto").change((e)=>actualizarFoto(e));
 
     $("#pax_detalles").hide();
     $("#pax_historial").hide();
     $("#historial_pax").hide();
-    $("#form_pasajero_dialog").dialog({
-        autoOpen:false,
-        width:600,
-        height:500,
-        modal:true,
-        title:"Nuevo Pasajero",
-        buttons: {"Agregar Pasajero": agregarPax,
-            cancel: ()=>{$("#form_pasajero_dialog").dialog( "close" );}
-        }
+    $("#ver_buscar").hide();
+    $("#ver_buscar").click(()=>{
+        $("#pax_detalles").effect('drop', '', 500, ()=>{
+            $("#pax_detalles").hide();
+            $("#pax_lista").show();
+            $("#ver_buscar").hide();
+            $("#agregar_pax").show()
+        })
     });
-    $("#editar_pasajero_dialog").dialog({
-        autoOpen:false,
-        width:600,
-        height:500,
-        modal:true,
-        title:"Actualizar Pasajero",
-        buttons: {"Actualizar Datos": actualizarPax,
-            cancel: ()=>{$("#editar_pasajero_dialog").dialog( "close" );}
-        }
-    });
-    $("#editar_foto_dialog").dialog({
-        autoOpen:false,
-        modal:true,
-        title:"Actualizar Foto",
-        buttons: {"Actualizar Foto": actualizarFoto,
-            cancel: ()=>{$("#editar_foto_dialog").dialog( "close" );}
-        }
-    });
-    listarPax();
-    $("#buscar_pax").keyup(()=>{
-        $.ajax({
-            url: plugin_ruta+'src/controllers/pasajeroController.php',
-            type:"POST",
-            data:'buscar='+$("#buscar_pax").val(),
-            success: (res)=>{listarBuscar(res)}
-        });               
-    });
+    // $("#form_pasajero_dialog").dialog({
+    //     autoOpen:false,
+    //     width:600,
+    //     height:500,
+    //     modal:true,
+    //     title:"Nuevo Pasajero",
+    //     buttons: {"Agregar Pasajero": agregarPax,
+    //         cancel: ()=>{$("#form_pasajero_dialog").dialog( "close" );}
+    //     }
+    // });
+    // $("#editar_pasajero_dialog").dialog({
+    //     autoOpen:false,
+    //     width:600,
+    //     height:500,
+    //     modal:true,
+    //     title:"Actualizar Pasajero",
+    //     buttons: {"Actualizar Datos": actualizarPax,
+    //         cancel: ()=>{$("#editar_pasajero_dialog").dialog( "close" );}
+    //     }
+    // });
+    // $("#editar_foto_dialog").dialog({
+    //     autoOpen:false,
+    //     modal:true,
+    //     title:"Actualizar Foto",
+    //     buttons: {"Actualizar Foto": actualizarFoto,
+    //         cancel: ()=>{$("#editar_foto_dialog").dialog( "close" );}
+    //     }
+    // });
 
     $("#agregar_pax").click(()=>{
-        $("#form_pasajero_dialog").dialog('open');
+        // $("#form_pasajero_dialog").dialog('open');
         $("#form_pasajero").load(plugin_ruta+'src/views/forms/pasajero-nuevo.php');
     })
     $("#historial_pax").click((e)=>{
@@ -204,9 +223,9 @@ function listarPax(){
     });
 }
 
-function listarBuscar(r){
-    var res = eval(r);
-    pasajeros = res;
+function listarBuscar(res){
+    // var res = eval(r);
+    // pasajeros = res;
     $("#pax_datos").html("");
     for(i=0;i<res.length;i++){
         var foto=(res[i].foto==null || res[i].foto==undefined) ? plugin_ruta+"src/imagenes/dummy-pax.jpg" : res[i].foto;
@@ -215,6 +234,11 @@ function listarBuscar(r){
         var telefono=(res[i].telefono==null) ? "" : res[i].telefono;
         $("#pax_datos").append('<li onclick="seleccionarPax('+res[i].id+')" class="active grey lighten-3 p-2 d-flex" style="cursor:pointer"><img src="'+foto+'" width:"50" height="50" alt="avatar" class="avatar rounded-circle d-flex align-self-center mr-2 z-depth-1"><div class="text-small text-left" style="width:70%"><strong>'+res[i].nombres+' '+res[i].apellidos+'</strong><p class="last-message text-muted"><i class="fa fa-phone"></i> '+telefono+' <i class="fa fa-envelope"></i> '+correo+'</p></div><div style="width:10%"><button class="btn btn-link"><i class="fa fa-angle-right align-middle"></i></button></div></li>');
     }
+}
+function filtrarPax(b){
+    console.log(b);
+    paxFiltrados = pasajeros.filter(p=>p.nombres.toString().toLowerCase().includes(b) || p.apellidos.toString().toLowerCase().includes(b));
+    listarBuscar(paxFiltrados);
 }
 
 function seleccionarPax(id){
@@ -230,8 +254,13 @@ function seleccionarPax(id){
             dir = eval(res)[4];
             if(pax.foto == null || pax.foto == undefined)
                 pax.foto = plugin_ruta+"src/imagenes/logo.png";
-            console.log(pax);
-            $("#pax_detalles").show();
+            // console.log(pax);
+            $("#pax_lista").effect('drop', '', 500, ()=>{
+                $("#pax_lista").hide();
+                $("#pax_detalles").show();
+                $("#ver_buscar").show();
+                $("#agregar_pax").hide()
+            });
             $("#pax_foto").attr('src', pax.foto);
             $("#pax_name").val(pax.nombres);
             $("#pax_apellidos").val(pax.apellidos);
@@ -267,7 +296,8 @@ function agregarPax(){
             data: 'insertar=true&'+data,
             success: (res)=>{
                 console.log(res);
-                $("#form_pasajero_dialog").dialog( "close" );
+                $("#agregar_pax_close").click();
+                listarPax();
             }
         });
     }
@@ -395,6 +425,7 @@ function editarTel(id){
 
 function actualizarTel(id, telefono){
     // console.log(id,telefono);
+    $("#telefono_"+id).remove()
     if(telefono){
         $.ajax({
             type:"POST",
@@ -497,5 +528,3 @@ function borrarCor(id){
 </script>
 <style>
 </style>
-
-

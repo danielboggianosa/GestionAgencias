@@ -9,6 +9,7 @@ class Contacto {
     
     public function listar(){
         global $wpdb;
+        $wp_users = $wpdb->prefix."users";
         if(isset($_POST['campo']) and isset($_POST['orden'])){
             $campo = $_POST['campo'];
             $orden = $_POST['orden'];
@@ -44,7 +45,7 @@ class Contacto {
             GROUP   BY pdm_historial_tabla_ID
         ) c ON  b.pdm_historial_tabla_ID = c.pdm_historial_tabla_ID
             AND b.pdm_historial_creado = Max_date           
-        INNER JOIN wp_users f
+        INNER JOIN $wp_users f
             ON pdm_historial_usuario = f.ID
         GROUP BY conId
         $filtro
@@ -102,14 +103,14 @@ class Contacto {
     
     public function buscar($valor){
         global $wpdb;
-        $sql = "SELECT ".$this->tabla."_id as conId, ".$this->tabla."_nombres as nombres, ".$this->tabla."_apellidos as apellidos, ".$this->tabla."_fuente as fuente, ".$this->tabla."_estado as estado, pdm_telefono_numero as telefono, pdm_historial_contenido as nota, pdm_historial_creado as interaccion, user_login as usuario FROM ".$this->tabla." LEFT JOIN pdm_telefono ON pdm_telefono_tabla = '".$this->tabla."' AND pdm_telefono_tabla_ID = ".$this->tabla."_id INNER JOIN pdm_historial ON pdm_historial_tabla = '".$this->tabla."' AND pdm_historial_tabla_ID = ".$this->tabla."_id LEFT JOIN wp_users ON pdm_historial_usuario = ID WHERE ".$this->tabla."_nombres LIKE '%$valor%' OR ".$this->tabla."_apellidos LIKE '%$valor%' GROUP BY conId $filtro LIMIT 1500;";
+        $sql = "SELECT ".$this->tabla."_id as conId, ".$this->tabla."_nombres as nombres, ".$this->tabla."_apellidos as apellidos, ".$this->tabla."_fuente as fuente, ".$this->tabla."_estado as estado, pdm_telefono_numero as telefono, pdm_historial_contenido as nota, pdm_historial_creado as interaccion, user_login as usuario FROM ".$this->tabla." LEFT JOIN pdm_telefono ON pdm_telefono_tabla = '".$this->tabla."' AND pdm_telefono_tabla_ID = ".$this->tabla."_id INNER JOIN pdm_historial ON pdm_historial_tabla = '".$this->tabla."' AND pdm_historial_tabla_ID = ".$this->tabla."_id LEFT JOIN $wp_users ON pdm_historial_usuario = ID WHERE ".$this->tabla."_nombres LIKE '%$valor%' OR ".$this->tabla."_apellidos LIKE '%$valor%' GROUP BY conId $filtro LIMIT 1500;";
         $resultado = $wpdb->get_results($sql, OBJECT);
         echo json_encode($resultado);
     }
 
     public function historial($id){
         global $wpdb;
-        $sql = "SELECT pdm_historial_id as id, pdm_historial_creado as interaccion, pdm_historial_contenido as contenido, user_login as usuario FROM pdm_historial INNER JOIN wp_users ON wp_users.ID = pdm_historial_usuario WHERE pdm_historial_tabla = '".$this->tabla."' AND pdm_historial_tabla_ID = $id ORDER BY interaccion DESC;";
+        $sql = "SELECT pdm_historial_id as id, pdm_historial_creado as interaccion, pdm_historial_contenido as contenido, user_login as usuario FROM pdm_historial INNER JOIN $wp_users ON $wp_users.ID = pdm_historial_usuario WHERE pdm_historial_tabla = '".$this->tabla."' AND pdm_historial_tabla_ID = $id ORDER BY interaccion DESC;";
         $resultado = $wpdb->get_results($sql, OBJECT);
         echo json_encode($resultado);
     }

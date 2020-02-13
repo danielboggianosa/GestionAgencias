@@ -33,7 +33,7 @@
         &nbsp;Elementos
       </div>
       <div class="d-flex float-right">
-        <input type="search" name="buscar" id="buscar" placeholder="Filtrar" class="form-control">
+        <input type="search" name="buscar" id="buscar" placeholder="Filtrar" class="form-control" onkeyup="filtrarPax(this.value)">
       </div>
     </div>
     <br>
@@ -190,16 +190,7 @@ $(document).ready(()=>{
   $("#item").change((e)=>{
     items = e.currentTarget.value 
     paginar(1, items);
-  });
-
-  $("#buscar").keyup(()=>{
-      $.ajax({
-          url: plugin_ruta+'src/controllers/crmController.php',
-          type:"POST",
-          data:'buscar='+$("#buscar").val(),
-          success: (res)=>{listar(res)}
-      });               
-  });
+  });  
 
   $("#nuevoContactoBtn").click(()=>{$("#form_pasajero").load(plugin_ruta+'/src/views/forms/pasajero-nuevo.php')});  
 
@@ -223,6 +214,24 @@ var contactos, paginaActual = 1, paginas;
 function listar(r){
     var res = eval(r);
     contactos = res;
+    items = ($("#item").val()*1 > res.length) ? res.length : $("#item").val()*1;
+    $("#contactos").html("");
+    for(i=0;i<items;i++){
+        var correo=(res[i].correo==null) ? "" : res[i].correo;
+        var telefono=(res[i].telefono==null) ? "" : res[i].telefono;
+        var fuente=(res[i].fuente==null) ? "" : res[i].fuente;
+        $("#contactos").append('<tr><td><button class="btn btn-success" onclick="verHistorial('+i+')" title="Ver Historial" data-toggle="modal" data-target="#historialContacto"><i class="fa fa-plus"></i></button></td><td>'+res[i].nombres+'</td><td>'+res[i].apellidos+'</td><td>'+fuente+'</td><td>'+res[i].telefono+'</td><td>'+$.timeago(res[i].interaccion)+'</td><td>'+res[i].usuario+'</td><td>'+res[i].nota+'</td></tr>');
+    }
+    paginas = contactos.length / $("#item").val()*1;
+    $("#paginasBtns").html('');
+    for(i=0;i<=paginas;i++){
+      active = ((i+1)==paginaActual) ? "btn-primary" : "btn-default" ;
+      $("#paginasBtns").append('<input type="button" class="btn '+active+'" value="'+eval(i+1)+'" onclick="paginar(this.value, item.value)">')
+    }
+}
+function filtrarPax(b){
+    console.log(b);
+    res = contactos.filter(p=>p.nombres.toString().toLowerCase().includes(b) || p.apellidos.toString().toLowerCase().includes(b));
     items = ($("#item").val()*1 > res.length) ? res.length : $("#item").val()*1;
     $("#contactos").html("");
     for(i=0;i<items;i++){

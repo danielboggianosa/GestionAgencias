@@ -1,11 +1,11 @@
 <?php include RUTA."/src/views/common/head.php" ?>
 
-<div class="wrap container">
-    <button class="btn btn-success" id="insertarData">Insertar Dummy Data</button>
-    <form method="post">
+<div class="wrap">
+    <button type="button" class="btn btn-success" id="insertarData">Insertar Dummy Data</button>
+    <form method="post" class="container">
         <label for="query">CONSULTA SQL</label>
         <div class="code-block">
-        <textarea name="query" id="query" cols="30" rows="10" class="form-control"></textarea>
+        <input type="text" name="query" id="query" class="form-control"></textarea>
         </div>
         <button class="btn btn-info">Cargar Query</button>
     </form>
