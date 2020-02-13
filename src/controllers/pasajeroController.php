@@ -291,6 +291,65 @@ class Pasajero {
         $resultado = $wpdb->get_results($sql, OBJECT);
         echo json_encode($resultado);
     }
+    public function AgregarFoto(){
+        global $wpdb;
+        $table = $this->tabla;
+        $id=$_POST['paxId'];
+        if($_FILES["fileToUpload"]["size"] != 0){
+            $target_dir = RUTA."src/imagenes/$table/";
+            $target_file = $target_dir . basename($id.".jpg");
+            $uploadOk = 1;
+            $imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
+            // Check if image file is a actual image or fake image
+            // if(isset($_POST["submit"])) {
+            //     $check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
+            //     if($check !== false) {
+            //         echo "File is an image - " . $check["mime"] . ".";
+            //         $uploadOk = 1;
+            //     } else {
+            //         echo "File is not an image.";
+            //         $uploadOk = 0;
+            //     }
+            // }
+            // Check if file already exists
+            // if (file_exists($target_file)) {
+            //     echo "Sorry, file already exists.";
+            //     $uploadOk = 0;
+            // }
+            // Check file size
+            if ($_FILES["fileToUpload"]["size"] > 2000000) {
+                echo "Sorry, your file is too large.";
+                $uploadOk = 0;
+            }
+            // Allow certain file formats
+            if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
+            && $imageFileType != "gif" ) {
+                echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+                $uploadOk = 0;
+            }
+            // Check if $uploadOk is set to 0 by an error
+            if ($uploadOk == 0) {
+                echo "Sorry, your file was not uploaded.";
+            // if everything is ok, try to upload file
+            } 
+            else {
+                if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
+                    echo "The file ". basename($id). " has been uploaded.";
+                } else {
+                    echo "No se subió ningún archivo.";
+                }
+            }
+            $wpdb->update(
+                $table,
+                $data = array( $table."_foto" => "/wp-content/plugins/pdm-admin/src/imagenes/$table/$id.jpg" ),
+                array( $table."_id" => $id )
+            );
+            $wpdb->insert("pdm_registro", array(
+                "pdm_registro_contenido" => json_encode(array($table, $id, $data)),
+                "pdm_registro_usuario" => get_current_user_id()
+            ));    
+        }
+    }       
 }
 
 $pasajero = new Pasajero;
@@ -315,12 +374,6 @@ if(isset($_POST['actualizar'])){
     $pasajero->actualizar();
 }
 
-if(isset($_POST['actualizarFoto'])){
-    $id = $_POST['paxId'];
-    $pasajero->AgregarFoto($id);
-    // console_log($_FILES[]);
-}
-
 if(isset($_POST['actualizarTel'])){
     $pasajero->actualizarTel();
 }
@@ -343,6 +396,10 @@ if(isset($_POST['borrarTel'])){
 
 if(isset($_POST['borrarCor'])){
     $pasajero->borrarCor();
+}
+
+if(isset($_POST['actualizarFoto'])){
+    $pasajero->AgregarFoto();
 }
 
 if(isset($_POST['addPost'])){

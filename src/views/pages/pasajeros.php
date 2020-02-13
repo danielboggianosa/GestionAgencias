@@ -36,37 +36,44 @@
                     <button class="btn btn-info float-right" onclick="actualizarPax()">
                         <i class="fa fa-edit"></i> Actualizar</button>
                     </h2>
-                    <form id="detallesCargados">
+                    <!-- <form action="../wp-content/plugins/pdm-admin/src/views/upload.php">
+                        <input type="file" name="fileToUpload">
+                        <input type="submit" value="submit">
+                    </form> -->
+                    <form id="detallesCargados" enctype="multipart/form-data">
                         <div class="row">
                             <div class="col-md-4">
-                                <img src="../wp-content/plugins/pdm-admin/src/imagenes/dummy-pax.jpg" alt="avatar" class="avatar rounded-circle d-flex mr-2 z-depth-1 h-auto w-auto mx-auto" style="max-height:100px;max-width:100px" id="pax_foto"  onclick="editarFoto()">
+                            <label for="foto">
+                                <img src="../wp-content/plugins/pdm-admin/src/imagenes/dummy-pax.jpg" alt="avatar" class="avatar rounded-circle d-flex mr-2 z-depth-1 h-auto w-auto mx-auto" style="max-height:200px;max-width:200px" id="pax_foto">
+                            </label>
+                            <input class="d-none" type="file" name="foto" id="foto">
                             </div>
-                            <div class="col-md-4">
-                                <label>Nombres:</label>
-                                <input type="text" id="pax_name" name="nombre">
+                            <div class="col-8 row">
+                                <div class="col-md-6">
+                                    <label>Nombres:</label>
+                                    <input type="text" id="pax_name" name="nombre">
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Apellidos:</label>
+                                    <input type="text" class="" id="pax_apellidos" name="apellido">
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Nacimiento:</label>
+                                    <input type="date" id="pax_nacimiento" name="nacimiento">
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Nacionalidad:</label>
+                                    <input type="text" id="pax_nacionalidad" name="nacionalidad">
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Notas:</label>
+                                    <input type="text" id="pax_notas" name="observacion">
+                                </div>
+                                <div class="col-md-6">
+                                <label>Fuente de Marketing</label>
+                                <input type="text" id="pax_fuente" name="fuente">
+                                </div>
                             </div>
-                            <div class="col-md-4">
-                                <label>Apellidos:</label>
-                                <input type="text" class="" id="pax_apellidos" name="apellido">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <label>Nacimiento:</label>
-                                <input type="date" id="pax_nacimiento" name="nacimiento">
-                            </div>
-                            <div class="col-md-4">
-                                <label>Nacionalidad:</label>
-                                <input type="text" id="pax_nacionalidad" name="nacionalidad">
-                            </div>
-                            <div class="col-md-4">
-                                <label>Notas:</label>
-                                <input type="text" id="pax_notas" name="observacion">
-                            </div>
-                            <div class="col-md-6">
-                            <label>Fuente de Marketing</label>
-                            <input type="text" id="pax_fuente" name="fuente">
-                        </div>
                         </div>
                     </form>
                     <div class="row" id="pax_documentos"></div>
@@ -122,11 +129,7 @@ var pasajeros=[];
 var pax,tel,cor,dir,doc;
 $(document).ready(()=>{
     
-    $("#submitFoto").click(e=>{
-        e.preventDefault;
-        var data = $("#editar_foto").serialize();
-        console.log(data);    
-    });
+    $("#foto").change((e)=>actualizarFoto(e));
 
     $("#pax_detalles").hide();
     $("#pax_historial").hide();
@@ -362,18 +365,24 @@ function actualizarPax(){
     }
 }
 
-function actualizarFoto(){
-    var data = $("#editar_foto").serialize();
+function actualizarFoto(e){
+    var foto = e.currentTarget.files[0];
+    var data=new FormData(document.getElementById("detallesCargados"));
+    data.append('fileToUpload', $("#foto")[0].files[0]);
+    data.append('actualizarFoto', true);
+    data.append('paxId', pax.id);
     console.log(data);
     if(foto.size>0){
         $.ajax({
             type:"POST",
-            url: plugin_ruta+'src/views/pages/upload.php',
+            url: plugin_ruta+'src/controllers/pasajeroController.php',
             data: data,
+            cache: false,
+            contentType: false,
+            processData: false,
             success: (res)=>{
                 listarPax();
                 seleccionarPax(pax.id);
-                $("#editar_foto_dialog").dialog( "close" );
             }
         });
     }
