@@ -1,7 +1,7 @@
 <?php include RUTA."/src/views/common/head.php" ?>
 
 <div class="wrap">
-    <button type="button" class="btn btn-success" id="insertarData">Insertar Dummy Data</button>
+    <!-- <button type="button" class="btn btn-success" id="insertarData">Insertar Dummy Data</button> -->
     <form method="post" class="container">
         <label for="query">CONSULTA SQL</label>
         <div class="code-block">
@@ -9,6 +9,12 @@
         </div>
         <button class="btn btn-info">Cargar Query</button>
     </form>
+<!--     <div class="panel-success p-3"><?php
+        echo DB_HOST.'<br>';
+        echo DB_USER.'<br>';
+        echo DB_NAME.'<br>';
+        echo RUTA.'<br>';
+    ?></div> -->
     <div class="panel">
         <?php
             if(isset($_POST["query"])){
@@ -39,7 +45,7 @@
             }
             else{
                 $resultados = array("");
-            }
+            }            
         ?>
     </div>
 </div>
@@ -59,7 +65,7 @@ function insertarDummy(){
             url: plugin_ruta+'src/controllers/pasajeroController.php',
             type: 'POST',
             data: dat,
-            success: (res)=>console.log(res)
+            //success: (res)=>console.log(res)
         })
     })
 }

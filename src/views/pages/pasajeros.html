@@ -1,0 +1,402 @@
+<div class="wrap" id="pasajerosModule">
+
+
+    <h1 class="text-primary d-flex justify-content-between">Contactos
+    <a class="dropdown-toggle btn btn-link float-right" href="#nuevoPasajero" role="button" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="nuevoPasajero" id="nuevoPasajeroBtn">
+        <i class="fas fa-plus text-gray-400"></i> Nuevo Contacto
+    </a>
+    </h1>
+    <div class="row" id="pasajeros">
+        <div class="col-12 collapse hide" id="nuevoPasajero">
+            <div class="card shadow mb-4">
+                <div class="card-header w-100 py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Nuevo Pasajero</h6>
+                </div>
+                <div class="card-body">
+                    <form id="nuevoPasajeroForm" class="form-style-8"></form>
+                </div>
+            </div>
+        </div>
+        <div class="col collapse show" id="listaPasajeros">
+            <div class="card shadow mb-4">
+                <div class="card-header w-100 py-3 d-flex flex-row align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Pasajeros</h6>
+                </div>
+                <div class="card-body">
+                    <div class="md-form mt-0" id="pax_search">
+                        <input class="form-control" name="buscar_pax" type="text" id="buscar_pax" placeholder="Filtrar por Nombre o Apellido del pasajero" aria-label="Filtrar por Nombre o Apellido del pasajero">
+                    </div>
+                    <div class="col-md-12"  style="max-height:510px;overflow-y:scroll;">
+                        <ul id="pasajeros">
+                            <script id="pasajeros-template" type="text/template">
+                                {{#pasajeros}}
+                                <li class="pasajero active grey lighten-3 p-2 d-flex" style="cursor:pointer" href="#listaPasajeros" role="button" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="listaPasajeros" id="{{id}}">
+                                    <img src="{{foto}}" width="50" height="50" alt="avatar" class="avatar rounded-circle d-flex align-self-center mr-2 z-depth-1">
+                                    <div class="text-small text-left" style="width:70%">
+                                        <strong>{{nombres}} {{apellidos}}</strong>
+                                        <p class="last-message text-muted">
+                                            <i class="fa fa-phone"></i> {{telefono}} 
+                                            <i class="fa fa-envelope"></i> {{correo}}
+                                        </p>
+                                    </div>
+                                    <div style="width:10%"><button class="btn btn-link"><i class="fa fa-angle-right align-middle"></i></button></div></li>
+                                {{/pasajeros}}
+                            </script>
+                        </ul>                       
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col collapse show" id="detallesPasajero">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header w-100 py-3 d-flex flex-row align-items-center justify-content-between">
+                <div class="dropdown no-arrow">
+                    <a class="dropdown-toggle" href="#listaPasajeros" role="button" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="listaPasajeros" title="Haz clic para ver todos los contactos">
+                        <i class="fas fa-angle-left fa-sm fa-fw text-gray-400"></i>
+                    </a>
+                </div>
+                <h6 class="m-0 font-weight-bold text-primary">Detalles del Contacto</h6>
+                <div class="dropdown no-arrow">
+                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#"><i class="fa fa-eye fa-sm fa-fw text-gray-400"></i> Ver Historial</a>
+                    <div class="dropdown-header">Agregar:</div>
+                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#nuevoTelefono"><i class="fa fa-phone fa-sm fa-fw text-gray-400"></i> Teléfono</a>
+                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#nuevoCorreo"><i class="fa fa-envelope fa-sm fa-fw text-gray-400"></i> Correo</a>
+                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#nuevaDireccion"><i class="fa fa-map-pin fa-sm fa-fw text-gray-400"></i> Dirección</a>
+                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#nuevaIdentificacion"><i class="fa fa-id-card fa-sm fa-fw text-gray-400"></i> identificacion</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#"><i class="fa fa-trash fa-sm fa-fw text-gray-400"></i> Eliminar</a>
+                    </div>
+                </div>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="col-md-12" id="datosPasajero" style="max-height:550px;overflow-y:scroll;">
+                        <span id="pasajero">
+                            <script id="pasajero-template" type="text/template">
+                                <div class="row form-style-8">
+                                    <form id="formPasajero" class="row" enctype="multipart/form-data">
+                                        {{#pasajero}}
+                                        <input type="hidden" class="d-none" name="paxId" value="{{id}}">
+                                        <div class="col-lg-4 card-image">
+                                            <img src="{{foto}}" class="avatar rounded-circle d-flex align-self-center mr-2 z-depth-1" style="max-height:100%;max-width:100%">
+                                            <label for="foto" class="btn btn-link">Cambiar Foto</label>
+                                            <input class="d-none" type="file" name="foto" id="foto" onchange="Pasajeros.actualizarFoto()">
+                                        </div>
+                                        <div class="col-lg-8 row">
+                                            <div class="col-sm-12 col-lg-6">
+                                                Nombres:&nbsp;<input type="text" name="nombre" value="{{nombres}}">
+                                            </div>
+                                            <div class="col-sm-12 col-lg-6">
+                                                Apellidos:&nbsp;<input type="text" name="apellido" value="{{apellidos}}">
+                                            </div>                                        
+                                            <div class="col-sm-12 col-lg-6">
+                                                Nacimiento:&nbsp;<input type="date" name="nacimiento" value="{{nacimiento}}">
+                                            </div>
+                                            <div class="col-sm-12 col-md-6">
+                                                Nacionalidad:&nbsp;<input type="text" name="nacionalidad" value="{{nacionalidad}}">
+                                            </div>
+                                            <div class="col-sm-12 col-lg-6">
+                                                Fuente:&nbsp;<input type="text" name="fuente" value="{{fuente}}">
+                                            </div>
+                                            <div class="col-sm-12 col-lg-6">
+                                                Notas:&nbsp;<textarea type="text" name="observacion" class="">{{notas}}</textarea>
+                                            </div>
+                                            <div class="col-12">                                            
+                                                <button type="button" class="btn btn-warning" onclick="Pasajeros.actualizar()"><i class="fa fa-edit"></i> Actualizar</button>
+                                            </div>
+                                        </div>
+                                        {{/pasajero}}
+                                    </form>
+                                </div>
+                                <div class="row form-style-8">
+                                    <div class="col-12">
+                                        <h4>Teléfonos</h4>
+                                        {{#telefono}}
+                                        <!-- <a class="btn btn-light btn-icon-split" href="tel:{{telefono}}"> -->
+                                            <span class="btn-icon-split px-2">
+                                                <input type="text" name="telefono" value="{{telefono}}" id="tel_{{id}}" onkeyup="Pasajeros.actualizarTelefono(event)" title="Edita y presiona Enter para guardar">
+                                                <button class="btn" onclick="Pasajeros.borrarTelefono({{id}})" title="Elimina este número"><i class="fas fa-trash" role="button"></i></button>
+                                            </span>
+                                        <!-- </a> -->
+                                        {{/telefono}}
+                                    </div>
+                                    <div class="col-12">
+                                        <h4>Correos</h4>
+                                        {{#correo}}
+                                            <span class="btn-icon-split px-2 w-50">
+                                                <input type="text" name="correo" value="{{correo}}" id="cor_{{id}}" onkeyup="Pasajeros.actualizarCorreo(event)" title="Edita y presiona Enter para guardar">
+                                                <button class="btn" onclick="Pasajeros.borrarCorreo({{id}})"><i class="fas fa-trash" role="button"></i></button>
+                                            </span>
+                                        {{/correo}}
+                                    </div>
+                                    <div class="col-12">
+                                        <h4>Dirección</h4>
+                                        {{#direccion}}
+                                        <div class="card">  
+                                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                                <h6 class="m-0 font-weight-bold text-primary">Dirección {{id}}</h6>
+                                                <div class="dropdown no-arrow">
+                                                  <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                                                  </a>
+                                                  <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                                                    <div class="dropdown-header">Acciones:</div>
+                                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#nuevaDireccion"><i class="fa fa-plus fa-sm fa-fw text-gray-400"></i> Nueva</a>
+                                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#borrarDireccion"><i class="fa fa-trash fa-sm fa-fw text-gray-400"></i> Eliminar</a>
+                                                  </div>
+                                                </div>
+                                            </div>
+                                            <div class="card-body row">
+                                                <div class="col-sm-12 col-lg-4">
+                                                    <label>País</label>
+                                                    <input type="text" name="pais" value="{{pais}}">
+                                                </div>
+                                                <div class="col-sm-12 col-lg-4">
+                                                    <label>Ciudad</label>
+                                                    <input type="text" name="ciudad" value="{{ciudad}}">
+                                                </div>
+                                                <div class="col-sm-12 col-lg-4">
+                                                    <label>Distrito</label>
+                                                    <input type="text" name="distrito" value="{{distrito}}">
+                                                </div>
+                                                <div class="col-12">
+                                                    <label>Dirección</label>
+                                                    <input type="text" name="nombre" value="{{nombre}}">
+                                                </div>
+                                                <div class="col-12">
+                                                    <label>Notas</label>
+                                                    <input type="text" name="nota" value="{{nota}}">
+                                                </div>
+                                                <div class="col-12">
+                                                    <button type="button" class="btn btn-warning"><i class="fa fa-edit"></i> Actualizar</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {{/direccion}}
+                                    </div>
+                                    <div class="col-12">
+                                        <h4>identificacion</h4>
+                                        {{#identificacion}}
+                                        <div class="card">  
+                                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                                <h6 class="m-0 font-weight-bold text-primary">Documento {{id}}</h6>
+                                                <div class="dropdown no-arrow">
+                                                  <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                                                  </a>
+                                                  <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                                                    <div class="dropdown-header">Acciones:</div>
+                                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#nuevaIdentificacion"><i class="fa fa-plus fa-sm fa-fw text-gray-400"></i> Nueva</a>
+                                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#borrarIdentificacion"><i class="fa fa-trash fa-sm fa-fw text-gray-400"></i> Eliminar</a>
+                                                  </div>
+                                                </div>
+                                            </div>
+                                            <div class="card-body row">
+                                                <div class="col-sm-12 col-lg-4">
+                                                    <label>País</label>
+                                                    <input type="text" name="pais" value="{{pais}}">
+                                                </div>
+                                                <div class="col-sm-12 col-lg-4">
+                                                    <label>Fecha de Emisión</label>
+                                                    <input type="date" name="emision" value="{{emision}}">
+                                                </div>
+                                                <div class="col-sm-12 col-lg-4">
+                                                    <label>Fecha de Emisión</label>
+                                                    <input type="date" name="vencimiento" value="{{vencimiento}}">
+                                                </div>
+                                                <div class="col-sm-12 col-lg-4">
+                                                    <label>Tipo</label>
+                                                    <input type="text" name="tipo" value="{{tipo}}">
+                                                </div>
+                                                <div class="col-sm-12 col-lg-4">
+                                                    <label>Número</label>
+                                                    <input type="text" name="numero" value="{{numero}}">
+                                                </div>
+                                                <div class="col-sm-12 col-lg-4">
+                                                    <label>Notas</label>
+                                                    <input type="text" name="notas" value="{{nota}}">
+                                                </div>
+                                                <div class="col-12">
+                                                    <button type="button" class="btn btn-warning"><i class="fa fa-edit"></i> Actualizar</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {{/identificacion}}
+                                    </div>
+                                </div>
+                            </script>
+                        </span>                       
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="modal fade" id="nuevaDireccion" role="dialog" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Nueva Dirección</h5>
+            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <form class="form-style-8" id="nuevaDireccionForm"></form>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
+            <a class="btn btn-success" href="#" data-dismiss="modal" onclick="Pasajeros.agregarDireccion()">Guardar</a>
+          </div>
+        </div>
+      </div>
+</div>
+
+<div class="modal fade" id="nuevaIdentificacion" role="dialog" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Nueva Identificacion</h5>
+            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <form class="form-style-8" id="nuevaIdentificacionForm"></form>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
+            <a class="btn btn-success" href="#" data-dismiss="modal" onclick="Pasajeros.agregarIdentificacion()">Guardar</a>
+          </div>
+        </div>
+      </div>
+</div>
+
+<div class="modal fade" id="borrarDireccion" role="dialog" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Borrar Dirección</h5>
+            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <div class="alert alert-danger">¿Realmente desea Borrar esta dirección?</div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
+            <a class="btn btn-danger" href="#" data-dismiss="modal" onclick="Pasajeros.borrarDireccion()">Borrar</a>
+          </div>
+        </div>
+      </div>
+</div>
+
+<div class="modal fade" id="borrarIdentificación" role="dialog" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Borrar Identificación</h5>
+            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <div class="alert alert-danger">¿Realmente desea Borrar esta identificacion?</div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
+            <a class="btn btn-danger" href="#" data-dismiss="modal" onclick="Pasajeros.borrarIdentificacion()">Borrar</a>
+          </div>
+        </div>
+      </div>
+</div>
+
+<div class="modal fade" id="nuevoCorreo" role="dialog" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Nuevo Correo</h5>
+            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <input type="text" class="form-control" name="correo" id="correoModal" placeholder="Escribe el correo">
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
+            <a class="btn btn-success" href="#" data-dismiss="modal" onclick="Pasajeros.agregarCorreo()">Agregar</a>
+          </div>
+        </div>
+      </div>
+</div>
+
+<div class="modal fade" id="nuevoTelefono" role="dialog" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Nuevo Teléfono</h5>
+            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <input type="text" class="form-control" name="telefono" id="telefonoModal" placeholder="Escribe el teléfono">
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
+            <a class="btn btn-success" href="#" data-dismiss="modal" onclick="Pasajeros.agregarTelefono()">Agregar</a>
+          </div>
+        </div>
+      </div>
+</div>
+
+<div class="modal fade" id="borrarCorreo" role="dialog" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Borrar Correo</h5>
+            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <div class="alert alert-danger">¿Realmente desea Borrar este correo?</div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
+            <a class="btn btn-danger" href="#" data-dismiss="modal" onclick="Pasajeros.borrarTelefono()">Borrar</a>
+          </div>
+        </div>
+      </div>
+</div>
+
+<div class="modal fade" id="borrarTelefono" role="dialog" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Borrar Teléfono</h5>
+            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <div class="alert alert-danger">¿Realmente desea Borrar este telefono?</div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
+            <a class="btn btn-danger" href="#" data-dismiss="modal" onclick="Pasajeros.borrarCorreo()">Borrar</a>
+          </div>
+        </div>
+      </div>
+</div>
+    

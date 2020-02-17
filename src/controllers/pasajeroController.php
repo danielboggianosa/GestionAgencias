@@ -29,7 +29,7 @@ class Pasajero {
         $sql = "SELECT pdm_identificacion_id as id, pdm_identificacion_numero as numero, pdm_identificacion_tipo as tipo, pdm_identificacion_pais as pais, pdm_identificacion_emision as emision, pdm_identificacion_vencimiento as vencimiento, pdm_identificacion_nota as nota, pdm_identificacion_foto as foto FROM pdm_identificacion WHERE pdm_identificacion_tabla = 'pdm_contacto' AND pdm_identificacion_tabla_ID = $id;";
         $identificacion = $wpdb->get_results($sql, OBJECT);
 
-        $sql = "SELECT pdm_direccion_pais as pais, pdm_direccion_ciudad as ciudad, pdm_direccion_distrito as distrito, pdm_direccion_nombre as nombre, pdm_direccion_id as id FROM pdm_direccion WHERE pdm_paxdir_direccion_ID = 'pdm_contacto' AND pdm_direccion_tabla_id = $id";
+        $sql = "SELECT pdm_direccion_pais as pais, pdm_direccion_ciudad as ciudad, pdm_direccion_distrito as distrito, pdm_direccion_nombre as nombre, pdm_direccion_id as id FROM pdm_direccion WHERE pdm_direccion_tabla = 'pdm_contacto' AND pdm_direccion_tabla_id = $id";
         $direccion = $wpdb->get_results($sql, OBJECT);
 
         $resultado = array(
@@ -129,12 +129,12 @@ class Pasajero {
             ),
             array($cid => $id)
         );
-        console_log($sql);
         $tabid = $id;
         $wpdb->insert("pdm_registro", array(
             "pdm_registro_contenido" => json_encode(array($table, $tabid, $data, 'actualizado')),
             "pdm_registro_usuario" => get_current_user_id()
         ));
+        echo json_encode($id);
     }
 
     public function actualizarTel(){
@@ -334,9 +334,9 @@ class Pasajero {
             } 
             else {
                 if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
-                    echo "The file ". basename($id). " has been uploaded.";
+                    // echo "The file ". basename($id). " has been uploaded.";
                 } else {
-                    echo "No se subió ningún archivo.";
+                    // echo "No se subió ningún archivo.";
                 }
             }
             $wpdb->update(
@@ -348,6 +348,7 @@ class Pasajero {
                 "pdm_registro_contenido" => json_encode(array($table, $id, $data)),
                 "pdm_registro_usuario" => get_current_user_id()
             ));    
+            echo json_encode($id);
         }
     }       
 }
