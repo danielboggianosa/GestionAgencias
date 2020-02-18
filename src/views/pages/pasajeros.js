@@ -26,6 +26,11 @@ var Pasajeros = (function(){
     
     function _render(p){
         if(!p) p=pasajeros;
+        p.forEach(pax=>{
+            console.log(pax);
+            if(pax.foto==null)
+                pax.foto = '../wp-content/plugins/pdm-admin/src/imagenes/dummy-pax.jpg';
+        });
         $ul.html(Mustache.render(template,{pasajeros:p}));        
         $nuevaDireccion.load(plugin_ruta+'src/views/forms/direccion.php');
         $nuevaIdentificacion.load(plugin_ruta+'src/views/forms/identificacion.php');
@@ -38,7 +43,7 @@ var Pasajeros = (function(){
             identificacion: p[3],
             direccion: p[4],
         }
-        if(p[0].foto) data.pasajero.foto = '../wp-content/plugins/pdm-admin/src/imagenes/dummy-pax.jpg'
+        if(p[0].foto==null) data.pasajero.foto = '../wp-content/plugins/pdm-admin/src/imagenes/dummy-pax.jpg'
         $span.html(Mustache.render(templatePax,data));
     }
     function _getPasajeros(){
