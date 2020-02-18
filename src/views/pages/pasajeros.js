@@ -156,6 +156,28 @@ var Pasajeros = (function(){
             });
         }
     }
+    function actualizar_Foto(){
+        var foto = $("#foto")[0].files[0];
+        var data=new FormData();
+        data.append('fileToUpload', foto);
+        data.append('actualizarFoto', true);
+        data.append('paxId', pasajero[0].id);
+        if(foto.size>0){
+            $.ajax({
+                type:"POST",
+                url: plugin_ruta+'src/controllers/pasajeroController.php',
+                data: data,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: res=>{
+                    var e={currentTarget:{id:eval(res)}};
+                    _getPasajeros();
+                    _seleccionarPasajero(e);
+                }
+            })
+        }
+    }
     function agregarTelefono(){
         var telefono=$("#telefonoModal").val();
         if(telefono){
@@ -368,7 +390,7 @@ var Pasajeros = (function(){
     }
     return{
         actualizar: actualizarPasajero,
-        actualizarFoto: actualizarFoto,
+        actualizarFoto: actualizar_Foto,
         agregarCorreo: agregarCorreo,
         actualizarCorreo: actualizarCorreo,
         borrarCorreo: borrarCorreo,
