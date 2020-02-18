@@ -52,7 +52,7 @@
                 <!-- Card Header - Dropdown -->
                 <div class="card-header w-100 py-3 d-flex flex-row align-items-center justify-content-between">
                 <div class="dropdown no-arrow">
-                    <a class="dropdown-toggle" href="#listaPasajeros" role="button" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="listaPasajeros" title="Haz clic para ver todos los contactos">
+                    <a class="dropdown-toggle" href="#listaPasajeros" role="button" id="expandirPasajero" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="listaPasajeros" title="Haz clic para ver todos los contactos">
                         <i class="fas fa-angle-left fa-sm fa-fw text-gray-400"></i>
                     </a>
                 </div>
@@ -63,14 +63,14 @@
                     </a>
                     <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#"><i class="fa fa-eye fa-sm fa-fw text-gray-400"></i> Ver Historial</a>
+                    <a class="dropdown-item" href="#solicitudes"><i class="fa fa-eye fa-sm fa-fw text-gray-400"></i> Ver Historial</a>
                     <div class="dropdown-header">Agregar:</div>
                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#nuevoTelefono"><i class="fa fa-phone fa-sm fa-fw text-gray-400"></i> Teléfono</a>
                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#nuevoCorreo"><i class="fa fa-envelope fa-sm fa-fw text-gray-400"></i> Correo</a>
                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#nuevaDireccion"><i class="fa fa-map-pin fa-sm fa-fw text-gray-400"></i> Dirección</a>
                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#nuevaIdentificacion"><i class="fa fa-id-card fa-sm fa-fw text-gray-400"></i> identificacion</a>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#"><i class="fa fa-trash fa-sm fa-fw text-gray-400"></i> Eliminar</a>
+                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#borrarPasajero"><i class="fa fa-trash fa-sm fa-fw text-gray-400"></i> Eliminar</a>
                     </div>
                 </div>
                 </div>
@@ -148,11 +148,11 @@
                                                   <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
                                                     <div class="dropdown-header">Acciones:</div>
                                                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#nuevaDireccion"><i class="fa fa-plus fa-sm fa-fw text-gray-400"></i> Nueva</a>
-                                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#borrarDireccion"><i class="fa fa-trash fa-sm fa-fw text-gray-400"></i> Eliminar</a>
+                                                    <a class="dropdown-item" href="#" id="dir_{{id}}" onclick="Pasajeros.borrarDireccion(event)"><i class="fa fa-trash fa-sm fa-fw text-gray-400" ></i> Eliminar</a>
                                                   </div>
                                                 </div>
                                             </div>
-                                            <div class="card-body row">
+                                            <form class="card-body row" id="formActualizarDireccion">
                                                 <div class="col-sm-12 col-lg-4">
                                                     <label>País</label>
                                                     <input type="text" name="pais" value="{{pais}}">
@@ -170,13 +170,9 @@
                                                     <input type="text" name="nombre" value="{{nombre}}">
                                                 </div>
                                                 <div class="col-12">
-                                                    <label>Notas</label>
-                                                    <input type="text" name="nota" value="{{nota}}">
+                                                    <button type="button" class="btn btn-warning" id="actualizarDireccion_{{id}}" onclick="Pasajeros.actualizarDireccion(event)"><i class="fa fa-edit"></i> Actualizar</button>
                                                 </div>
-                                                <div class="col-12">
-                                                    <button type="button" class="btn btn-warning"><i class="fa fa-edit"></i> Actualizar</button>
-                                                </div>
-                                            </div>
+                                              </form>
                                         </div>
                                         {{/direccion}}
                                     </div>
@@ -193,11 +189,11 @@
                                                   <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
                                                     <div class="dropdown-header">Acciones:</div>
                                                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#nuevaIdentificacion"><i class="fa fa-plus fa-sm fa-fw text-gray-400"></i> Nueva</a>
-                                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#borrarIdentificacion"><i class="fa fa-trash fa-sm fa-fw text-gray-400"></i> Eliminar</a>
+                                                    <a class="dropdown-item" href="#" id="doc_{{id}}" onclick="Pasajeros.borrarIdentificacion(event)"><i class="fa fa-trash fa-sm fa-fw text-gray-400"></i> Eliminar</a>
                                                   </div>
                                                 </div>
                                             </div>
-                                            <div class="card-body row">
+                                            <form class="card-body row" id="formActualizarIdentificacion">
                                                 <div class="col-sm-12 col-lg-4">
                                                     <label>País</label>
                                                     <input type="text" name="pais" value="{{pais}}">
@@ -223,12 +219,16 @@
                                                     <input type="text" name="notas" value="{{nota}}">
                                                 </div>
                                                 <div class="col-12">
-                                                    <button type="button" class="btn btn-warning"><i class="fa fa-edit"></i> Actualizar</button>
+                                                    <button type="button" class="btn btn-warning" id="actulizarIdentificacion_{{id}}" onclick="Pasajeros.actualizarIdentificacion(event)"><i class="fa fa-edit"></i> Actualizar</button>
                                                 </div>
-                                            </div>
+                                              </form>
                                         </div>
                                         {{/identificacion}}
                                     </div>
+                                    <!-- <div class="col-12">
+                                      <h3>Historial</h3>
+                                      <div class="row" id="solicitudes"></div>
+                                    </div> -->
                                 </div>
                             </script>
                         </span>                       
@@ -397,6 +397,46 @@
             <a class="btn btn-danger" href="#" data-dismiss="modal" onclick="Pasajeros.borrarCorreo()">Borrar</a>
           </div>
         </div>
-      </div>
+    </div>
+</div>
+
+<div class="modal fade" id="borrarPasajero" role="dialog" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Borrar Contacto</h5>
+            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <div class="alert alert-danger">¿Realmente deseas Borrar este contacto y todos sus datos??</div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
+            <a class="btn btn-danger" href="#" data-dismiss="modal" onclick="Pasajeros.borrarPasajero()">Borrar</a>
+          </div>
+        </div>
+    </div>
+</div>
+
+<a href="#" id="alertaBtn" class="d-none" data-toggle="modal" data-target="#alertaModal">.</a>
+<div class="modal fade" id="alertaModal" role="dialog" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Alerta</h5>
+            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <div class="alert" id="alertaMsg"></div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary" type="button" data-dismiss="modal">OK</button>
+          </div>
+        </div>
+    </div>
 </div>
     

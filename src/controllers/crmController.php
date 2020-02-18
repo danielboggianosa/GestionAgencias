@@ -47,6 +47,7 @@ class Contacto {
             AND b.pdm_historial_creado = Max_date           
         INNER JOIN $wp_users f
             ON pdm_historial_usuario = f.ID
+        WHERE a.pdm_contacto_estado != 'BORRADO'
         GROUP BY conId
         $filtro
         LIMIT 5000;";

@@ -21,12 +21,12 @@ var Pasajeros = (function(){
     $ul.delegate('li.pasajero', 'click', _seleccionarPasajero);
     $nuevo.delegate('#nuevoPasajeroSubmit','click', agregarPasajero);
     $('#actualizarPasajero').click(()=>alert('estoy vivo'));
+    $nuevoPasajeroBtn.click(()=>$nuevo.load(plugin_ruta+'src/views/forms/pasajero-nuevo.php'))
     _getPasajeros();
     
     function _render(p){
         if(!p) p=pasajeros;
-        $ul.html(Mustache.render(template,{pasajeros:p}));
-        $nuevo.load(plugin_ruta+'src/views/forms/pasajero-nuevo.php');
+        $ul.html(Mustache.render(template,{pasajeros:p}));        
         $nuevaDireccion.load(plugin_ruta+'src/views/forms/direccion.php');
         $nuevaIdentificacion.load(plugin_ruta+'src/views/forms/identificacion.php');
     }
@@ -38,6 +38,7 @@ var Pasajeros = (function(){
             identificacion: p[3],
             direccion: p[4],
         }
+        if(p[0].foto) data.pasajero.foto = '../wp-content/plugins/pdm-admin/src/imagenes/dummy-pax.jpg'
         $span.html(Mustache.render(templatePax,data));
     }
     function _getPasajeros(){
@@ -51,6 +52,43 @@ var Pasajeros = (function(){
                 _render();                
             }
         });
+    }
+    function _seleccionarPasajero(e){     
+        $.ajax({
+            url: plugin_ruta+'src/controllers/pasajeroController.php',
+            type: 'GET',
+            data: 'obtener='+e.currentTarget.id,
+            success: (r)=>{                
+                pasajero = eval(r);
+                // _getSolicitudes();
+                _renderPax(pasajero);                
+            }
+        });
+    }
+    function _alerta(mensaje){
+        $("#alertaBtn").click();
+        $("#alertaMsg").html(mensaje);
+    }
+    function _confirmar(mensaje){
+        $("#confirmarBtn").click();
+        $("#confirmarMsg").html(mensaje);
+    }
+    function _getSolicitudes(){
+        $.ajax({
+            url: plugin_ruta+'src/controllers/pasajeroController.php',
+            type: 'POST',
+            data: 'id='+pasajero[0].id+'&solicitud=true',
+            success: (res)=>{
+                sol = eval(res);
+                // console.log(sol);
+                html='<table class="table table-hover"><thead><tr><th>ID</th><th>ESTADO</th><th>DESTINO</th><th>SERVICIOS</th><th>DESCRIPCION</th></tr><tbody>';
+                for(i=0;i<sol.length;i++){
+                    html+='<tr><td>'+sol[i].id+'</td><td>'+sol[i].estado+'</td><td>'+sol[i].destino+'</td><td>'+sol[i].servicios+'</td><td>'+sol[i].descripcion+'</td></tr>';
+                }
+                html+='</tbody></table>';
+                $("#solicitudes").html(html);
+            }
+        })
     }
     function agregarPasajero(){
         var data = $nuevo.serialize();
@@ -69,7 +107,7 @@ var Pasajeros = (function(){
             });
         }
         else{
-            alert("Nombre y Apellidos no pueden estar vacíos")
+            _alerta("Nombre y/o Apellidos no pueden estar vacíos")
         }
     }
     function actualizarPasajero(){
@@ -82,28 +120,33 @@ var Pasajeros = (function(){
                 var e={currentTarget:{id:eval(res)}};
                 _getPasajeros();
                 _seleccionarPasajero(e);
-                alert('Contacto Actualizado');
+                _alerta('Contacto Actualizado');
             }
         });
     }
     function actualizarFoto(){
-        var data=new FormData(document.getElementById("formPasajero"));
-        data.append('fileToUpload', $("#foto")[0].files[0]);
-        data.append('actualizarFoto', true);
-        // console.log(data);
+        var foto = $("#foto")[0].files[0];
+        var data=new FormData();
+        data.append('fileToUpload', foto);
         if(foto.size>0){
             $.ajax({
                 type:"POST",
-                url: plugin_ruta+'src/controllers/pasajeroController.php',
+                url: 'http://138.197.196.196/api/',
                 data: data,
                 cache: false,
                 contentType: false,
                 processData: false,
-                success: (res)=>{
-                    var e={currentTarget:{id:eval(res)}};
-                    _getPasajeros();
-                    _seleccionarPasajero(e);
-                    alert('Foto actualizada. Por favor recarga la página');
+                success: res=>{
+                    $.ajax({
+                        type:"POST",
+                        url:plugin_ruta+'src/controllers/pasajeroController.php',
+                        data:'actualizarFoto=true&paxId='+pasajero[0].id+'&foto='+eval(res),
+                        success: r=>{
+                            var e={currentTarget:{id:eval(r)}};
+                            _getPasajeros();
+                            _seleccionarPasajero(e);
+                        }
+                    })
                 }
             });
         }
@@ -136,7 +179,7 @@ var Pasajeros = (function(){
                     var e={currentTarget:{id:pasajero[0].id}};
                     _getPasajeros()
                     _seleccionarPasajero(e);
-                    alert('Teléfono actualizado');
+                    _alerta('Teléfono actualizado');
                 }
             });
         }
@@ -184,7 +227,7 @@ var Pasajeros = (function(){
                     var e={currentTarget:{id:pasajero[0].id}};
                     _getPasajeros()
                     _seleccionarPasajero(e);
-                    alert('Correo actualizado');
+                    _alerta('Correo actualizado');
                 }
             });
         }
@@ -209,35 +252,114 @@ var Pasajeros = (function(){
         p = pasajeros.filter(p=>p.nombres.toString().toLowerCase().includes(b.toLowerCase()) || p.apellidos.toString().toLowerCase().includes(b.toLowerCase()));
         _render(p);
     }
-    function _seleccionarPasajero(e){     
-        $.ajax({
-            url: plugin_ruta+'src/controllers/pasajeroController.php',
-            type: 'GET',
-            data: 'obtener='+e.currentTarget.id,
-            success: (r)=>{                
-                pasajero = eval(r);
-                console.log(pasajero);
-                _renderPax(pasajero);                
-            }
-        });
-    }
     function agregarDireccion(){
-        console.log('nuevo Direccion')
+        var data = $("#nuevaDireccionForm").serialize();
+        if(pasajero){
+            $.ajax({
+                type:'POST',
+                url: plugin_ruta+'src/controllers/pasajeroController.php',
+                data:'agregarDir=true&paxId='+pasajero[0].id+'&'+data,
+                success: res=>{
+                    var e={currentTarget:{id:pasajero[0].id}};
+                    _alerta('Dirección agregada correctamente');
+                    _seleccionarPasajero(e);
+                }
+            })
+        }
     }
     function agregarIdentificacion(){
-        console.log('nueva Identificación')
+        var data = $("#nuevaIdentificacionForm").serialize();
+        if(pasajero){
+            $.ajax({
+                type:'POST',
+                url: plugin_ruta+'src/controllers/pasajeroController.php',
+                data:'agregarDoc=true&paxId='+pasajero[0].id+'&'+data,
+                success: (res)=>{
+                        var e={currentTarget:{id:pasajero[0].id}};
+                        _alerta(res);
+                        _getPasajeros();
+                        _seleccionarPasajero(e);
+                    }
+            })
+        }
     }
-    function actualizarDireccion(){
-        console.log('nuevo Direccion')
+    function actualizarDireccion(e){
+        if(pasajero){
+            var id=e.target.id.split('_')[1];
+            var data = $("#formActualizarDireccion").serialize();
+            $.ajax({
+                type:"POST",
+                url: plugin_ruta+'src/controllers/pasajeroController.php',
+                data: 'actualizarDir=true&dirId='+id+'&'+data,
+                success: ()=>{
+                    var e={currentTarget:{id:pasajero[0].id}};
+                    _seleccionarPasajero(e);
+                    _alerta('Dirección actualizada');
+                }
+            });
+        }
     }
-    function actualizarIdentificacion(){
-        console.log('nueva Identificación')
+    function actualizarIdentificacion(e){
+        if(pasajero){
+            var id=e.target.id.split('_')[1];
+            var data = $("#formActualizarIdentificacion").serialize();
+            $.ajax({
+                type:"POST",
+                url: plugin_ruta+'src/controllers/pasajeroController.php',
+                data: 'actualizarDoc=true&docId='+id+'&'+data,
+                success: ()=>{
+                    var e={currentTarget:{id:pasajero[0].id}};
+                    _seleccionarPasajero(e);
+                    _alerta('Identificación actualizada');
+                }
+            });
+        }
     }
-    function borrarDireccion(){
-        console.log('nuevo Direccion')
+    function borrarDireccion(e){
+        var borrar = confirm("Realmente desea borrar esta dirección")
+        var dirId = e.currentTarget.id.split('_')[1];
+        if(borrar){
+            $.ajax({
+                type:"POST",
+                url:plugin_ruta+"src/controllers/pasajeroController.php",
+                data:"borrarDir=true&dirId="+dirId,
+                success: res=>{
+                    var e={currentTarget:{id:pasajero[0].id}};
+                    _alerta(eval(res));
+                    _seleccionarPasajero(e);
+                }
+            })
+        }
     }
-    function borrarIdentificacion(){
-        console.log('nueva Identificación')
+    function borrarIdentificacion(e){
+        var borrar = confirm("Realmente desea borrar esta identificación")
+        var docId = e.currentTarget.id.split('_')[1];
+        if(borrar){
+            $.ajax({
+                type:"POST",
+                url:plugin_ruta+"src/controllers/pasajeroController.php",
+                data:"borrarDoc=true&docId="+docId,
+                success: res=>{
+                    var e={currentTarget:{id:pasajero[0].id}};
+                    _alerta(eval(res));
+                    _seleccionarPasajero(e);
+                }
+            })
+        }
+    }
+    function borrarPasajero(){
+        if(pasajero){
+            $.ajax({
+                type:"POST",
+                url:plugin_ruta+"src/controllers/pasajeroController.php",
+                data:"borrarPax=true&paxId="+pasajero[0].id,
+                success: res=>{
+                    $("#expandirPasajero").click();
+                    _getPasajeros()
+                    _alerta('Contacto eliminado con éxito');
+                }
+            })
+        }
     }
     return{
         actualizar: actualizarPasajero,
@@ -254,5 +376,6 @@ var Pasajeros = (function(){
         agregarIdentificacion: agregarIdentificacion,
         actualizarIdentificacion: actualizarIdentificacion,
         borrarIdentificacion: borrarIdentificacion,
+        borrarPasajero: borrarPasajero,
     }
 })();
