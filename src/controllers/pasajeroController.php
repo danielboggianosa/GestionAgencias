@@ -58,7 +58,7 @@ class Pasajero {
             $this->tabla.'_nacimiento' => $_POST["nacimiento"],
             $this->tabla.'_notas' => $_POST["observacion"],
             $this->tabla.'_fuente' => $_POST["fuente"],
-            $this->tabla.'_estado' => "PROSPECTO",
+            $this->tabla.'_estado' => "PROSPECTO"
         ));
         $paxid = $wpdb->insert_id;
         $wpdb->insert("pdm_registro", array(
@@ -458,7 +458,7 @@ class Pasajero {
                 "pdm_identificacion_pais" => $identificacion['pais'],
                 "pdm_identificacion_emision" => $identificacion['f_ini'],
                 "pdm_identificacion_vencimiento" => $identificacion['f_fin'],
-                "pdm_identificacion_nota" => $identificacion['nota'],
+                "pdm_identificacion_nota" => $identificacion['nota']
                 ),
                 array($tab."_id" => $docid)
             );
